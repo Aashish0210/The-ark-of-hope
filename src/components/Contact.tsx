@@ -157,10 +157,10 @@ export default function Contact() {
                       Email Address
                     </span>
                     <a
-                      href="mailto:Ark4nepal@arkofhopeproject.com"
-                      className="text-white hover:text-gold transition-colors text-[15px] sm:text-base font-medium mt-1 block break-all"
+                      href="mailto:ark4nepal@arkofhopeproject.com"
+                      className="text-white hover:text-gold transition-colors text-[15px] sm:text-base font-medium mt-1 block break-all lowercase"
                     >
-                      Ark4nepal@arkofhopeproject.com
+                      ark4nepal@arkofhopeproject.com
                     </a>
                   </div>
                 </div>
