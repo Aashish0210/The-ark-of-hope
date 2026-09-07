@@ -37,9 +37,26 @@ export default function Hero({ subtitle, title, text }: HeroProps) {
         setDonated(true);
     };
 
-    const titleParts = title.split(' ');
-    const mainTitle = titleParts[0];
-    const spanTitle = titleParts.slice(1).join(' ');
+    let mainTitle = title;
+    let spanTitle = '';
+
+    if (title.includes('\n')) {
+        const parts = title.split('\n');
+        mainTitle = parts[0].trim();
+        spanTitle = parts.slice(1).join(' ').trim();
+    } else {
+        const match = title.match(/^(.*?)\s+(Project)$/i);
+        if (match) {
+            mainTitle = match[1];
+            spanTitle = match[2];
+        } else {
+            const lastSpace = title.lastIndexOf(' ');
+            if (lastSpace !== -1) {
+                mainTitle = title.slice(0, lastSpace);
+                spanTitle = title.slice(lastSpace + 1);
+            }
+        }
+    }
 
     return (
         <header id="home" className="relative min-h-screen flex items-center justify-center text-center pt-6 sm:pt-10 md:pt-20 overflow-hidden bg-[#050c16]">
@@ -59,18 +76,29 @@ export default function Hero({ subtitle, title, text }: HeroProps) {
                 </div>
             ))}
 
-            <div className="relative z-10 max-w-[800px] px-6">
+            <div className="relative z-10 max-w-[1000px] px-6">
 
-                <h1 className="text-[3.5rem] md:text-[5.5rem] leading-[1.1] md:leading-[1.15] font-bold mb-4">
-                    {mainTitle}<br /><span className="text-[4rem] md:text-[6.5rem] text-gold leading-[1.1] md:leading-[1.15] inline-block mt-2">{spanTitle}</span>
+                <h1 className="font-bold mb-3">
+                    <span className="block text-[2.75rem] sm:text-[4.5rem] md:text-[5.8rem] lg:text-[6.6rem] leading-[1.08] tracking-tight sm:tracking-normal drop-shadow-[0_4px_24px_rgba(0,0,0,0.9)]">
+                        {mainTitle}
+                    </span>
+                    {spanTitle && (
+                        <div className="w-[320px] max-w-full mx-auto mt-2 sm:mt-3">
+                            <span className="block font-body font-sans text-[44px] sm:text-[52px] md:text-[60px] text-gold tracking-[0.12em] pl-[0.12em] font-bold leading-none drop-shadow-[0_2px_12px_rgba(212,175,55,0.3)] text-center whitespace-nowrap">
+                                {spanTitle}
+                            </span>
+                        </div>
+                    )}
                 </h1>
 
                 {!donated ? (
                     <>
-                        <p className="text-white tracking-[2px] text-[24px] md:text-[32px] font-medium mb-8 font-serif italic drop-shadow-[0_4px_12px_rgba(0,0,0,1)] max-w-[800px] mx-auto">
-                            {subtitle}
-                        </p>
-                        <div className="max-w-[320px] mx-auto">
+                        <div className="w-[320px] max-w-full mx-auto mb-8">
+                            <p className="text-white text-[28px] font-medium font-serif italic drop-shadow-[0_4px_12px_rgba(0,0,0,1)] text-center whitespace-nowrap">
+                                {subtitle}
+                            </p>
+                        </div>
+                        <div className="w-[320px] max-w-full mx-auto">
                             <button
                                 onClick={() => openDonation()}
                                 className="w-full bg-gold text-navy font-bold py-5 rounded-xl tracking-[2px] hover:bg-white hover:-translate-y-1 transition-all duration-400 shadow-[0_10px_30px_rgba(212,175,55,0.3)] hover:shadow-[0_15px_40px_rgba(212,175,55,0.5)] active:scale-95 heading-font px-8 text-lg"
@@ -88,10 +116,6 @@ export default function Hero({ subtitle, title, text }: HeroProps) {
                         <p className="text-[16px] text-white font-medium tracking-wide">YOUR STORY OF FAITH HAS BEEN RECORDED</p>
                     </div>
                 )}
-            </div>
-
-            <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-[0.5rem] z-20">
-                <div className="w-[1px] h-[50px] bg-gradient-to-b from-gold to-transparent"></div>
             </div>
         </header>
     );

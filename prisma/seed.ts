@@ -16,8 +16,8 @@ async function main() {
             id: 1,
             raised: 0,
             goal: 100000000,
-            heroSubtitle: "A STORY OF FAITH IN KENTUCKY",
-            heroTitle: "ASHA JAHAJ ARK OF HOPE",
+            heroSubtitle: "A story of faith in Nepal",
+            heroTitle: "Ark of Hope Project",
             heroText: "Every great journey begins with a single step. Once gifted for The Art Donate, see the work, and please be ready—one donation at a time.",
         }
     })

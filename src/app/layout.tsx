@@ -15,7 +15,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: 'The Art Donate | A Story of Faith',
+  title: 'Ark of Hope Project | A Story of Faith in Nepal',
   description: 'Every great journey begins with a single plank. Once gifted for the Ark, see the work, and please be ready—one donation at a time.',
 };
 

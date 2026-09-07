@@ -30,10 +30,10 @@ export default function Navbar() {
         <div className="max-w-[1200px] mx-auto px-6 flex justify-between items-center">
           <Link
             href="/"
-            className="flex flex-col md:flex-row md:items-center gap-0 md:gap-2 text-gold no-underline text-[17px] md:text-xl font-bold tracking-widest heading-font drop-shadow-[0_0_6px_rgba(201,148,58,0.5)] leading-tight"
+            className="flex items-center gap-1.5 md:gap-2 no-underline text-[15px] sm:text-[17px] md:text-xl font-bold tracking-widest heading-font drop-shadow-[0_0_8px_rgba(201,148,58,0.3)] leading-tight"
           >
-            <span>ASHA JAHAJ</span>
             <span className="text-white">ARK OF HOPE</span>
+            <span className="text-gold">PROJECT</span>
           </Link>
 
           <ul className="hidden md:flex list-none gap-4 lg:gap-8 items-center whitespace-nowrap">
@@ -67,6 +67,14 @@ export default function Navbar() {
                 className="text-white hover:text-gold no-underline text-sm tracking-wider uppercase transition-colors heading-font"
               >
                 Progress
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="#contact"
+                className="text-white hover:text-gold no-underline text-sm tracking-wider uppercase transition-colors heading-font"
+              >
+                Contact
               </Link>
             </li>
             <li>
@@ -128,6 +136,13 @@ export default function Navbar() {
           className="font-cinzel text-sm font-semibold tracking-widest text-cream/75 no-underline py-4 border-b border-gold/10 transition-all hover:text-gold hover:pl-2"
         >
           Progress
+        </Link>
+        <Link
+          href="#contact"
+          onClick={() => setMenuOpen(false)}
+          className="font-cinzel text-sm font-semibold tracking-widest text-cream/75 no-underline py-4 border-b border-gold/10 transition-all hover:text-gold hover:pl-2"
+        >
+          Contact
         </Link>
         <div className="mt-8">
           <button
