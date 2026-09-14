@@ -12,7 +12,7 @@
     "@libsql/client": "^0.17.0",
     "@prisma/adapter-libsql": "^7.4.2",
     "bcryptjs": "^3.0.3",
-    "next": "15.5.14",
+    "next": "^15.5.25",
     "next-auth": "^4.24.11",
     "pusher": "^5.3.2",
     "pusher-js": "^8.4.0",

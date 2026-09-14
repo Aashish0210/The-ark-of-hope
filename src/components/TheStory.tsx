@@ -1,26 +1,121 @@
+"use client";
+
+import { useState } from "react";
+
 export function TheStoryPart1() {
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  const toggleExpand = () => {
+    if (isExpanded) {
+      setIsExpanded(false);
+      const el = document.getElementById("the-story");
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth" });
+      }
+    } else {
+      setIsExpanded(true);
+    }
+  };
+
   return (
     <section
       id="the-story"
-      className="pt-28 pb-20 bg-navy relative border-t border-white/5"
+      className="pt-28 pb-20 bg-navy relative border-t border-white/5 scroll-mt-20"
     >
       <div className="max-w-[1200px] mx-auto px-6">
-        <header className="text-center mb-4">
-          <h2 className="text-[2.5rem] leading-[1.2] uppercase drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)] font-cinzel">
-            The Story
+        <header className="text-center mb-8">
+          <span className="text-gold tracking-[2px] text-xs md:text-sm font-semibold uppercase block mb-3 heading-font">
+            Our Story
+          </span>
+          <h2 className="text-[2.2rem] md:text-[2.8rem] leading-[1.2] uppercase drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)] font-cinzel text-white">
+            The Story Behind the Vision
           </h2>
         </header>
-        <article className="prose prose-invert max-w-none text-text-muted text-[18px] md:text-[20px] leading-[1.8] tracking-wide font-sans text-center [&>p]:mb-4 [&>div]:mt-8 mx-auto max-w-[800px]">
-          <p>
-            Across the world, from ancient Asia to South America, from Rome to
-            India, and through many cultures and traditions, humanity has
-            carried stories of a great flood, a vessel of rescue, and a new
-            beginning. These recurring themes, found across many traditions, find
-            a profound expression in the biblical account of Noah’s Ark. Though
-            these stories come from different peoples and places, they point to
-            something deeply shared in the human heart: the longing for
-            preservation, hope, restoration, and a future beyond destruction.
+
+        <article className="prose prose-invert max-w-none text-text-muted text-[17px] md:text-[19px] leading-[1.8] tracking-wide font-sans text-center mx-auto max-w-[850px]">
+          {/* First Section (Always Visible) */}
+          <p className="text-white font-medium text-lg md:text-xl mb-3">
+            The Ark of Hope Project began with a simple question:
           </p>
+
+          <p className="text-gold font-semibold text-xl md:text-2xl font-cinzel tracking-wider leading-snug mb-6">
+            &ldquo;How can we create something in Nepal that causes people to stop, think, ask deeper questions, and encounter a message of hope?&rdquo;
+          </p>
+
+          <p className="mb-6">
+            For the project&apos;s founder, that question grew out of a lifetime shaped by both loss and purpose. Born in the Terai-Madhesh region of Nepal, he lost his father as a young child and later lost an older brother while studying law in Kathmandu. Those experiences caused him to think deeply about the brevity of life and what it means to use the life we have been given for something that matters.
+          </p>
+
+          {/* Remaining Content (Visible when Expanded) */}
+          {isExpanded && (
+            <div className="space-y-6 pt-2 text-text-muted">
+              <p>
+                Years later, during the uncertainty and loss of the COVID-19 pandemic, that desire took on a new urgency. He began praying about how people throughout Nepal and beyond could encounter the message of God&apos;s love and hope—not only through words, but through an experience that could capture the imagination of children, families, and visitors from around the world.
+              </p>
+
+              <p className="text-gold font-semibold text-lg md:text-xl font-cinzel tracking-wider">
+                Toward the end of 2020, the vision for the Ark of Hope Project began to take shape.
+              </p>
+
+              <p>
+                The dream is to create a landmark destination in Nepal centered around a half-scale representation of Noah&apos;s Ark—a place where biblical history, education, culture, family experiences, hospitality, and meaningful reflection come together.
+              </p>
+
+              <p>
+                The story of a great flood and an ark is not found only in one place or one culture. Across the world, many peoples and traditions preserve stories of a great flood, a vessel of rescue, and a family or community delivered from destruction. These shared memories create a meaningful point of connection between cultures and invite people from different backgrounds to gather around the biblical account of Noah&apos;s Ark.
+              </p>
+
+              <p className="text-gold font-semibold text-xl md:text-2xl font-cinzel tracking-wider leading-snug">
+                But the vision is bigger than the Ark itself.
+              </p>
+
+              <p>
+                It is about creating a place where children can learn, families can experience something meaningful together, visitors can explore one of the world&apos;s most enduring stories, and people from many nations, cultures, and backgrounds can discover the hope found in the God who saves and delivers. As people recognize echoes of a story preserved in their own cultures, we pray that curiosity will become hunger—a desire not only to learn about the biblical account, but to encounter the God behind it for themselves.
+              </p>
+
+              <p>
+                The project also seeks to create a place where local communities can benefit from new opportunities, and where people from around the world can come together in a spirit of welcome, reflection, and shared discovery.
+              </p>
+
+              <p>
+                Building something of this scale will require far more than one person&apos;s vision. It will take people who believe in what it can become—people willing to bring their prayers, expertise, relationships, resources, and support.
+              </p>
+
+              <p className="text-white font-semibold text-lg md:text-xl font-cinzel tracking-wider">
+                The Ark of Hope began as one man&apos;s vision, but it will take many people to make it a reality.
+              </p>
+
+              <p className="text-gold font-medium italic">
+                We invite you to become part of the story—and help build a place of hope in Nepal where people from many cultures can encounter the biblical story of the Ark, be stirred to seek the God who saves and delivers, and help build a legacy that can serve generations to come.
+              </p>
+            </div>
+          )}
+
+          {/* Read More / Read Less CTA Button */}
+          <div className="mt-8 flex justify-center">
+            <button
+              type="button"
+              onClick={toggleExpand}
+              className="inline-flex items-center gap-2.5 px-6 py-3 rounded-full border border-gold/40 text-gold hover:bg-gold/15 hover:border-gold transition-all duration-300 font-cinzel font-semibold tracking-wider text-xs md:text-sm uppercase shadow-[0_2px_10px_rgba(0,0,0,0.3)] hover:scale-105 active:scale-95 cursor-pointer"
+            >
+              <span>{isExpanded ? "Read Less" : "Read More"}</span>
+              <svg
+                className={`w-4 h-4 transition-transform duration-300 ${
+                  isExpanded ? "rotate-180" : ""
+                }`}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
+            </button>
+          </div>
         </article>
       </div>
     </section>
