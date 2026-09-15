@@ -147,7 +147,7 @@ export default function ProgressTracker({ raised = 0, goal = 9000000 }: Progress
             <div className="max-w-[1200px] mx-auto px-6 relative z-10">
 
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-4 heading-font w-full">
-                    <h2 className="text-[2.5rem] md:text-[3.5rem] font-bold tracking-wide leading-none">
+                    <h2 className="text-[1.8rem] sm:text-[2.5rem] md:text-[3.5rem] font-bold tracking-wide leading-none break-words">
                         <span className="text-gold">${displayRaised.toLocaleString('en-US', { notation: 'compact', maximumFractionDigits: 1 })}</span> <span className="text-white">RAISED</span>
                     </h2>
                     <span className="text-text-muted text-sm tracking-widest mb-1 mt-2 md:mt-0 font-medium uppercase">GOAL: ${safeGoal.toLocaleString('en-US', { notation: 'compact', maximumFractionDigits: 1 })}</span>

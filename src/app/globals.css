@@ -17,12 +17,23 @@
 @layer base {
   html {
     scroll-behavior: smooth;
+    overflow-x: hidden;
+    max-width: 100%;
+    width: 100%;
   }
 
   body {
     @apply bg-bg-base text-text-main font-body;
     line-height: 1.6;
     overflow-x: hidden;
+    max-width: 100%;
+    width: 100%;
+    position: relative;
+  }
+
+  main, section, header, footer {
+    max-width: 100%;
+    overflow-x: clip;
   }
 
   h1,
@@ -30,6 +41,8 @@
   h3,
   .heading-font {
     @apply font-heading uppercase;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
   }
 
   /* Hide number input arrows globally */

@@ -12,7 +12,7 @@ export function TheStoryPart1() {
           <span className="text-gold tracking-[2px] text-xs md:text-sm font-semibold uppercase block mb-3 heading-font">
             Our Story
           </span>
-          <h2 className="text-[2.2rem] md:text-[2.8rem] leading-[1.2] uppercase drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)] font-cinzel text-white">
+          <h2 className="text-[1.8rem] sm:text-[2.2rem] md:text-[2.8rem] leading-[1.2] uppercase drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)] font-cinzel text-white break-words">
             The Story Behind the Vision
           </h2>
         </header>
@@ -59,7 +59,7 @@ export function TheStoryPart2() {
     <section id="our-mission" className="py-24 bg-navy relative border-t border-white/5">
       <div className="max-w-[1200px] mx-auto px-6">
         <header className="text-center mb-4">
-          <h2 className="text-[2.5rem] leading-[1.2] uppercase drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)] font-cinzel">
+          <h2 className="text-[1.8rem] sm:text-[2.2rem] md:text-[2.5rem] leading-[1.2] uppercase drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)] font-cinzel break-words">
             The Mission
           </h2>
         </header>
@@ -119,48 +119,77 @@ export function TheStoryPart2() {
 
 export function TheStoryPart3() {
   return (
-    <section className="py-24 bg-navy relative border-t border-white/5">
-      <div className="max-w-[1200px] mx-auto px-6">
-        <div className="grid md:grid-cols-[1.05fr_0.95fr] items-center gap-10 md:gap-16">
-          <article className="prose prose-invert max-w-none text-text-muted text-[18px] md:text-[20px] leading-[1.8] tracking-wide font-sans text-left mx-auto w-full">
-            <h3 className="text-gold font-semibold text-[1.7rem] md:text-[2.1rem] font-cinzel tracking-[0.05em] uppercase mb-6 text-left">
-              The Founder&apos;s Testimony
-            </h3>
+    <section className="py-16 md:py-20 bg-navy relative border-t border-white/5">
+      <div className="max-w-[1100px] mx-auto px-6">
+        <header className="mb-5">
+          <h2 className="text-gold font-semibold text-[1.6rem] sm:text-[1.9rem] md:text-[2.4rem] font-cinzel tracking-[0.05em] uppercase text-left break-words">
+            The Founder&apos;s Testimony
+          </h2>
+        </header>
 
+        {/* Top Section: Two-Column Layout with Clean Tight Spacing */}
+        <div className="grid lg:grid-cols-[1.35fr_0.85fr] md:grid-cols-[1.25fr_0.85fr] items-start gap-6 md:gap-8 mb-2.5">
+          {/* Left Column: Opening Story */}
+          <div className="space-y-2.5 text-text-muted text-[16px] md:text-[17px] leading-[1.6] font-sans">
             <p>
-              Long before the vision for the Ark of Hope Project was born, its founder was on a very different journey—a personal search for truth. While studying law in Kathmandu, a course in jurisprudence led him to examine different religious traditions. Christianity was the one he knew almost nothing about. That changed when a friend invited him to a church service. From there, he began asking questions, reading the Bible, and slowly discovering the hope and truth he had not known before.
+              Long before the vision for the Ark of Hope Project was born, its founder was on a very different journey—a personal search for truth.
             </p>
-
             <p>
-              He soon realized that the God he had been searching for was not distant, but near. Through prayer, Scripture, and conversation, he began to see that faith was not a rejection of reason, but a deeper and more honest search for meaning. He found himself drawn to the story of Jesus Christ—especially to the message of love, sacrifice, and redemption.
+              While studying law in Kathmandu, a course in jurisprudence led him to examine different religious traditions. Christianity was the one faith he knew almost nothing about. Together with two friends, he began asking a simple question:
+              <br />
+              <span className="text-white font-medium italic block mt-0.5">Who is Jesus Christ?</span>
             </p>
-
             <p>
-              What began as curiosity became conviction. He came to believe that the life, death, and resurrection of Jesus were not just historical facts, but the very center of hope for a broken world. He began to see that faith was not a set of rules, but a relationship with the living God.
+              Their curiosity led them to a small sign for Mahima Church. They walked inside looking for answers and soon began meeting with a pastor, asking questions and learning about the Christian faith.
             </p>
-
             <p>
-              His answer was simple: “Even if they do not go, I will go alone.”
+              The journey was not immediate. There were questions, doubts, and times when he stopped attending altogether. But something kept drawing him back. He continued wrestling with questions about God, sin, sacrifice, salvation, and the person of Jesus Christ.
             </p>
-
             <p>
-              He continued seeking, and in January 2003, he was baptized. What began as a curiosity became conviction. What began as a search for answers became a personal faith in Jesus Christ. And with that faith came a new desire: that others might have the same opportunity to discover the hope he had found.
+              Eventually, his friends chose not to continue. He then faced a deeply personal decision: would his search for truth depend on the choices of others, or would he continue on his own?
             </p>
+            <div>
+              <p className="text-text-muted">His answer was simple:</p>
+              <p className="text-white font-bold text-[17px] md:text-[18px] mt-0.5">
+                &ldquo;Even if they do not go, I will go alone.&rdquo;
+              </p>
+            </div>
+          </div>
 
-            <p>
-              That prayer continues to shape his life today. The Ark of Hope Project is an expression of that same desire. His hope is not simply to build something remarkable, but to be an instrument through which others are invited to seek, ask questions, and discover for themselves the faith and hope that changed his life.
-            </p>
-          </article>
-
-          <div className="flex justify-center md:justify-end">
-            <div className="relative w-full max-w-[520px] overflow-hidden rounded-[22px] border border-gold/10 bg-[#071827] shadow-[0_15px_45px_rgba(2,10,20,0.7)]">
+          {/* Right Column: Static Portrait Card */}
+          <div className="flex items-center justify-center">
+            <div className="w-full max-w-[320px] md:max-w-[340px] rounded-2xl border border-gold/20 bg-gradient-to-b from-[#0e243d] via-[#081728] to-[#040c16] shadow-[0_15px_45px_rgba(0,0,0,0.7)] p-3 md:p-4 flex items-center justify-center pointer-events-none select-none">
               <img
-                src="/uploads/1773493215236-Screenshot-2026-02-09-at-9.30.24-AM.png"
-                alt="Founder portrait"
-                className="w-full h-full object-cover object-center block"
+                src="/founder.png"
+                alt="The Founder"
+                className="w-full h-auto max-h-[500px] object-contain block mx-auto drop-shadow-[0_12px_28px_rgba(0,0,0,0.7)]"
               />
             </div>
           </div>
+        </div>
+
+        {/* Bottom Section: Clean, Tight Continuing Narrative */}
+        <div className="space-y-2.5 text-text-muted text-[16px] md:text-[17px] leading-[1.6] font-sans">
+          <p>
+            He continued seeking, and in January 2003, he was baptized.
+          </p>
+          <p>
+            What began as curiosity became conviction. What began as a search for answers became a personal faith in Jesus Christ. And with that faith came a new desire: that others might have the same opportunity to discover the hope he had found.
+          </p>
+          <p>
+            That desire soon became practical. Because his mother tongue is Maithili, he became especially burdened for people who might struggle to hear and understand the Christian message in their own language. He began gathering people for Maithili fellowship and praying that God would use his life to help others encounter Christ.
+          </p>
+
+          <p className="text-gold font-bold text-[17px] md:text-[18px] pt-1">
+            That prayer continues to shape his life today.
+          </p>
+
+          <p>
+            The Ark of Hope Project is an expression of that same desire. His hope is not simply to build something remarkable, but to be an instrument through which others are invited to seek, ask questions, and discover for themselves the faith and hope that changed his own life.
+          </p>
+          <p>
+            He once went searching for answers to the question, &ldquo;Who is Jesus Christ?&rdquo; Today, his prayer is that his life can help others begin that same journey.
+          </p>
         </div>
       </div>
     </section>
@@ -177,7 +206,7 @@ export function TheStoryPart4() {
             <span className="text-gold tracking-[2px] text-xs md:text-sm font-semibold uppercase block mb-3 heading-font">
               Location & Grounds
             </span>
-            <h2 className="text-[2.5rem] md:text-[3rem] leading-[1.2] uppercase drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)] font-cinzel text-white">
+            <h2 className="text-[1.8rem] sm:text-[2.4rem] md:text-[3rem] leading-[1.2] uppercase drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)] font-cinzel text-white break-words">
               Project Site
             </h2>
             <p className="text-text-muted text-base md:text-lg max-w-[620px] mx-auto mt-3">

@@ -12,7 +12,7 @@ export default function Contact() {
           <span className="text-gold tracking-[2px] text-xs md:text-sm font-semibold uppercase block mb-3 heading-font">
             Location & Grounds
           </span>
-          <h2 className="text-[2.5rem] md:text-[3rem] leading-[1.2] uppercase drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)] font-cinzel text-white">
+          <h2 className="text-[1.8rem] sm:text-[2.4rem] md:text-[3rem] leading-[1.2] uppercase drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)] font-cinzel text-white break-words">
             Project Site
           </h2>
           <p className="text-text-muted text-base md:text-lg max-w-[620px] mx-auto mt-3">

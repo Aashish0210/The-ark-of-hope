@@ -87,13 +87,13 @@ export default function Hero({ subtitle, title, text }: HeroProps) {
 
             <div className="relative z-10 max-w-[1000px] px-4 sm:px-6">
 
-                <h1 className="font-bold mb-1 sm:mb-2 md:mb-3">
-                    <span className="block text-[2.25rem] xs:text-[2.6rem] sm:text-[4.5rem] md:text-[5.8rem] lg:text-[6.6rem] leading-[1.08] tracking-tight sm:tracking-normal drop-shadow-[0_4px_24px_rgba(0,0,0,0.9)]">
+                <h1 className="font-bold mb-1 sm:mb-2 md:mb-3 max-w-full">
+                    <span className="block text-[1.9rem] xs:text-[2.3rem] sm:text-[3.8rem] md:text-[5.5rem] lg:text-[6.5rem] leading-[1.1] tracking-tight sm:tracking-normal drop-shadow-[0_4px_24px_rgba(0,0,0,0.9)] break-words">
                         {mainTitle}
                     </span>
                     {spanTitle && (
                         <div className="w-[240px] sm:w-[280px] md:w-[320px] max-w-full mx-auto mt-0.5 sm:mt-1.5 md:mt-3">
-                            <span className="block font-body font-sans text-[32px] xs:text-[38px] sm:text-[48px] md:text-[60px] text-gold tracking-[0.12em] pl-[0.12em] font-bold leading-none drop-shadow-[0_2px_12px_rgba(212,175,55,0.3)] text-center whitespace-nowrap">
+                            <span className="block font-body font-sans text-[26px] xs:text-[32px] sm:text-[44px] md:text-[58px] text-gold tracking-[0.12em] pl-[0.12em] font-bold leading-none drop-shadow-[0_2px_12px_rgba(212,175,55,0.3)] text-center">
                                 {spanTitle}
                             </span>
                         </div>
