@@ -27,10 +27,10 @@ export default function Navbar() {
       <nav
         className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 pt-[max(0.6rem,env(safe-area-inset-top))] ${scrolled || menuOpen ? "pb-3 sm:pb-4 bg-navy/95 backdrop-blur-md border-b border-gold/20 shadow-2xl" : "pb-3 sm:pb-5 bg-navy/90 md:bg-gradient-to-b md:from-navy/90 md:to-transparent backdrop-blur-md md:backdrop-blur-none border-b border-gold/20 md:border-b-0"}`}
       >
-        <div className="max-w-[1200px] mx-auto px-3 xs:px-4 sm:px-6 flex justify-between items-center gap-2">
+        <div className="max-w-[1200px] mx-auto px-3 xs:px-4 sm:px-6 flex justify-between items-center gap-1.5 sm:gap-2 min-w-0">
           <Link
             href="/"
-            className="flex items-center gap-1 sm:gap-1.5 md:gap-2 no-underline text-[12px] xs:text-[14px] sm:text-[17px] md:text-xl font-bold tracking-wider sm:tracking-widest heading-font drop-shadow-[0_0_8px_rgba(201,148,58,0.3)] leading-tight min-w-0"
+            className="flex items-center gap-1 sm:gap-1.5 md:gap-2 no-underline text-[10px] xs:text-[12px] sm:text-[17px] md:text-xl font-bold tracking-[0.08em] sm:tracking-widest heading-font drop-shadow-[0_0_8px_rgba(201,148,58,0.3)] leading-tight min-w-0 flex-shrink truncate"
           >
             <span className="text-white whitespace-nowrap">ARK OF HOPE</span>
             <span className="text-gold shrink-0">PROJECT</span>
@@ -88,7 +88,7 @@ export default function Navbar() {
           </ul>
 
           <button
-            className="flex md:hidden items-center justify-center w-10 h-10 rounded-xl bg-gold hover:bg-white text-navy shrink-0 transition-all duration-200 cursor-pointer shadow-[0_2px_12px_rgba(223,178,93,0.5)] active:scale-95 z-50 p-0 border border-gold"
+            className="flex md:hidden items-center justify-center w-10 h-10 rounded-xl bg-gold hover:bg-white text-navy shrink-0 flex-shrink-0 transition-all duration-200 cursor-pointer shadow-[0_2px_12px_rgba(223,178,93,0.5)] active:scale-95 z-50 p-0 border border-gold ml-auto"
             onClick={() => setMenuOpen(!menuOpen)}
             aria-label={menuOpen ? "Close menu" : "Open menu"}
           >
