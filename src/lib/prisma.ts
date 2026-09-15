@@ -3,8 +3,6 @@ import { PrismaClient } from '@prisma/client'
 const hasDatabaseUrl = Boolean(process.env.POSTGRES_URL)
 
 const createFallbackPrisma = () => {
-  const emptyResult = async <T>(fallback: T): Promise<T> => fallback
-
   const createModelProxy = () =>
     new Proxy(
       {},
@@ -16,7 +14,7 @@ const createFallbackPrisma = () => {
             return undefined
           }
 
-          return async (...args: unknown[]) => {
+          return async (...args: any[]) => {
             if (method === 'findFirst' || method === 'findUnique' || method === 'findMany') {
               return args[0]?.where ? null : []
             }
@@ -31,10 +29,6 @@ const createFallbackPrisma = () => {
 
             if (method === 'createMany' || method === 'deleteMany' || method === 'updateMany') {
               return { count: 0 }
-            }
-
-            if (method === 'delete' || method === 'deleteMany') {
-              return null
             }
 
             return null
@@ -53,11 +47,11 @@ const createFallbackPrisma = () => {
   }
 }
 
-const globalForPrisma = globalThis as unknown as {
-  prisma: PrismaClient | ReturnType<typeof createFallbackPrisma> | undefined
+const globalForPrisma = globalThis as typeof globalThis & {
+  prisma?: PrismaClient | any
 }
 
-export const prisma = hasDatabaseUrl
+export const prisma: any = hasDatabaseUrl
   ? (globalForPrisma.prisma ?? new PrismaClient())
   : (globalForPrisma.prisma ?? createFallbackPrisma())
 

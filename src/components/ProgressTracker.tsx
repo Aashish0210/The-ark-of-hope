@@ -7,8 +7,11 @@ interface ProgressProps {
     goal: number;
 }
 
-export default function ProgressTracker({ raised, goal }: ProgressProps) {
-    const [currentRaised, setCurrentRaised] = useState(raised);
+export default function ProgressTracker({ raised = 0, goal = 9000000 }: ProgressProps) {
+    const safeRaised = Number.isFinite(Number(raised)) ? Number(raised) : 0;
+    const safeGoal = Number.isFinite(Number(goal)) && Number(goal) > 0 ? Number(goal) : 9000000;
+
+    const [currentRaised, setCurrentRaised] = useState(safeRaised);
     const [displayRaised, setDisplayRaised] = useState(0);
     const [inView, setInView] = useState(false);
     const [mounted, setMounted] = useState(false);
@@ -20,8 +23,8 @@ export default function ProgressTracker({ raised, goal }: ProgressProps) {
 
     // Initial sync
     useEffect(() => {
-        setCurrentRaised(raised);
-    }, [raised]);
+        setCurrentRaised(safeRaised);
+    }, [safeRaised]);
 
     // WebSocket Real-time logic
     useEffect(() => {
@@ -100,7 +103,7 @@ export default function ProgressTracker({ raised, goal }: ProgressProps) {
     }, [inView, currentRaised]);
 
     // Set percentage dynamically based on view triggering the SVG and bar animations simultaneously
-    const percentage = inView ? Math.min((currentRaised / goal) * 100, 100) : 0;
+    const percentage = inView ? Math.min((currentRaised / safeGoal) * 100, 100) : 0;
 
     // Shared transform logic for synced alignment
     const hullTransform = {
@@ -147,7 +150,7 @@ export default function ProgressTracker({ raised, goal }: ProgressProps) {
                     <h2 className="text-[2.5rem] md:text-[3.5rem] font-bold tracking-wide leading-none">
                         <span className="text-gold">${displayRaised.toLocaleString('en-US', { notation: 'compact', maximumFractionDigits: 1 })}</span> <span className="text-white">RAISED</span>
                     </h2>
-                    <span className="text-text-muted text-sm tracking-widest mb-1 mt-2 md:mt-0 font-medium uppercase">GOAL: ${goal.toLocaleString('en-US', { notation: 'compact', maximumFractionDigits: 1 })}</span>
+                    <span className="text-text-muted text-sm tracking-widest mb-1 mt-2 md:mt-0 font-medium uppercase">GOAL: ${safeGoal.toLocaleString('en-US', { notation: 'compact', maximumFractionDigits: 1 })}</span>
                 </div>
 
                 <div className="relative w-full mb-2 h-1 mt-4">

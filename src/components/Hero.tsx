@@ -15,6 +15,10 @@ export default function Hero({ subtitle, title, text }: HeroProps) {
     const [currentSlide, setCurrentSlide] = useState(0);
     const [donated, setDonated] = useState(false);
 
+    const safeSubtitle = typeof subtitle === 'string' && subtitle.trim() ? subtitle : 'A story of faith in Nepal';
+    const safeTitle = typeof title === 'string' && title.trim() ? title : 'Ark of Hope Project';
+    const safeText = typeof text === 'string' && text.trim() ? text : 'Every great journey begins with a single plank. Once gifted for the Ark, see the work, and please be ready—one donation at a time.';
+
     const images = [
         "/hero-1.png", // Realistic Construction
         "/hero-2.png", // Realistic Interior
@@ -37,23 +41,23 @@ export default function Hero({ subtitle, title, text }: HeroProps) {
         setDonated(true);
     };
 
-    let mainTitle = title;
+    let mainTitle = safeTitle;
     let spanTitle = '';
 
-    if (title.includes('\n')) {
-        const parts = title.split('\n');
+    if (safeTitle.includes('\n')) {
+        const parts = safeTitle.split('\n');
         mainTitle = parts[0].trim();
         spanTitle = parts.slice(1).join(' ').trim();
     } else {
-        const match = title.match(/^(.*?)\s+(Project)$/i);
+        const match = safeTitle.match(/^(.*?)\s+(Project)$/i);
         if (match) {
             mainTitle = match[1];
             spanTitle = match[2];
         } else {
-            const lastSpace = title.lastIndexOf(' ');
+            const lastSpace = safeTitle.lastIndexOf(' ');
             if (lastSpace !== -1) {
-                mainTitle = title.slice(0, lastSpace);
-                spanTitle = title.slice(lastSpace + 1);
+                mainTitle = safeTitle.slice(0, lastSpace);
+                spanTitle = safeTitle.slice(lastSpace + 1);
             }
         }
     }
@@ -100,7 +104,7 @@ export default function Hero({ subtitle, title, text }: HeroProps) {
                     <>
                         <div className="w-[280px] sm:w-[320px] max-w-full mx-auto mt-2 sm:mt-3 md:mt-5 mb-4 sm:mb-5 md:mb-8">
                             <p className="text-white text-[18px] xs:text-[20px] sm:text-[24px] md:text-[28px] font-medium font-serif italic drop-shadow-[0_4px_12px_rgba(0,0,0,1)] text-center">
-                                {subtitle}
+                                {safeSubtitle}
                             </p>
                         </div>
                         <div className="w-[240px] sm:w-[280px] md:w-[320px] max-w-full mx-auto">

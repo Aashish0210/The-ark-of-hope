@@ -118,53 +118,53 @@ export function TheStoryPart2() {
 }
 
 export function TheStoryPart3() {
-  // return (
-    // <section className="py-24 bg-navy relative border-t border-white/5">
-    //   <div className="max-w-[1200px] mx-auto px-6">
-    //     <article className="prose prose-invert max-w-none text-text-muted text-[18px] md:text-[20px] leading-[1.8] tracking-wide font-sans text-center [&>p]:mb-4 [&>div]:mt-8 mx-auto max-w-[800px]">
-    //       <p className="text-gold font-semibold text-2xl text-center font-cinzel tracking-wider leading-snug">
-    //         But the heart of the project reaches even further.
-    //       </p>
+  return (
+    <section className="py-24 bg-navy relative border-t border-white/5">
+      <div className="max-w-[1200px] mx-auto px-6">
+        <div className="grid md:grid-cols-[1.05fr_0.95fr] items-center gap-10 md:gap-16">
+          <article className="prose prose-invert max-w-none text-text-muted text-[18px] md:text-[20px] leading-[1.8] tracking-wide font-sans text-left mx-auto w-full">
+            <h3 className="text-gold font-semibold text-[1.7rem] md:text-[2.1rem] font-cinzel tracking-[0.05em] uppercase mb-6 text-left">
+              The Founder&apos;s Testimony
+            </h3>
 
-    //       <p>
-    //         The Ark of Hope Project is designed to be a bridge. It will invite people
-    //         who may come from very different traditions to discover a story that
-    //         speaks across generations and cultures. It will welcome families,
-    //         students, tourists, spiritual seekers, historians, educators, and
-    //         people of faith. It will create a place where conversation can
-    //         happen, where curiosity can grow, and where people can reflect on
-    //         the deeper questions of life: What does it mean to be saved? What
-    //         does it mean to begin again? What hope remains when the world feels
-    //         broken?
-    //       </p>
+            <p>
+              Long before the vision for the Ark of Hope Project was born, its founder was on a very different journey—a personal search for truth. While studying law in Kathmandu, a course in jurisprudence led him to examine different religious traditions. Christianity was the one he knew almost nothing about. That changed when a friend invited him to a church service. From there, he began asking questions, reading the Bible, and slowly discovering the hope and truth he had not known before.
+            </p>
 
-    //       <p>
-    //         Located in Nepal, a nation already known as a meeting place of
-    //         cultures, mountains, pilgrims, and travelers, the Ark of Hope Project has
-    //         the opportunity to become a landmark destination. It can bless the
-    //         local economy, create jobs, strengthen tourism, support education,
-    //         and provide a meaningful experience for both local and international
-    //         visitors.
-    //       </p>
+            <p>
+              He soon realized that the God he had been searching for was not distant, but near. Through prayer, Scripture, and conversation, he began to see that faith was not a rejection of reason, but a deeper and more honest search for meaning. He found himself drawn to the story of Jesus Christ—especially to the message of love, sacrifice, and redemption.
+            </p>
 
-    //       <p>
-    //         Your contribution is not simply helping build a structure. You are
-    //         helping build a place of encounter. A place where ancient history,
-    //         biblical truth, cultural connection, and modern creativity come
-    //         together. A place where people from many backgrounds can walk
-    //         through the same doors, experience the same story, and leave with a
-    //         renewed sense of wonder, reflection, and hope.
-    //       </p>
+            <p>
+              What began as curiosity became conviction. He came to believe that the life, death, and resurrection of Jesus were not just historical facts, but the very center of hope for a broken world. He began to see that faith was not a set of rules, but a relationship with the living God.
+            </p>
 
-    //       <p>
-    //         The Ark of Hope Project is a call to remember that humanity’s story is
-    //         connected. It is a call to build something that outlasts us. It is a
-    //         call to create a destination that speaks to the heart of the world.
-    //       </p>
-    //     </article>
-    //   </div>
-    // </section>
-  // );
+            <p>
+              His answer was simple: “Even if they do not go, I will go alone.”
+            </p>
+
+            <p>
+              He continued seeking, and in January 2003, he was baptized. What began as a curiosity became conviction. What began as a search for answers became a personal faith in Jesus Christ. And with that faith came a new desire: that others might have the same opportunity to discover the hope he had found.
+            </p>
+
+            <p>
+              That prayer continues to shape his life today. The Ark of Hope Project is an expression of that same desire. His hope is not simply to build something remarkable, but to be an instrument through which others are invited to seek, ask questions, and discover for themselves the faith and hope that changed his life.
+            </p>
+          </article>
+
+          <div className="flex justify-center md:justify-end">
+            <div className="relative w-full max-w-[520px] overflow-hidden rounded-[22px] border border-gold/10 bg-[#071827] shadow-[0_15px_45px_rgba(2,10,20,0.7)]">
+              <img
+                src="/uploads/1773493215236-Screenshot-2026-02-09-at-9.30.24-AM.png"
+                alt="Founder portrait"
+                className="w-full h-full object-cover object-center block"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
 }
 
 export function TheStoryPart4() {
