@@ -31,14 +31,14 @@ export const metadata: Metadata = {
   keywords: ['Ark of Hope', 'Nepal Ark', 'Revival Zahaz', 'Chitwan Ark', 'Faith in Nepal', 'Build the Ark', 'Nepal SBI Bank NSBINPKA'],
   icons: {
     icon: [
-      { url: '/icon.png', sizes: 'any', type: 'image/png' },
-      { url: '/logo.png', sizes: '512x512', type: 'image/png' },
-      { url: '/favicon.ico' },
+      { url: '/logo.png?v=2', sizes: '512x512', type: 'image/png' },
+      { url: '/icon.png?v=2', sizes: 'any', type: 'image/png' },
+      { url: '/favicon.ico?v=2' },
     ],
-    shortcut: '/logo.png',
+    shortcut: '/logo.png?v=2',
     apple: [
-      { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
-      { url: '/logo.png' },
+      { url: '/apple-touch-icon.png?v=2', sizes: '180x180', type: 'image/png' },
+      { url: '/logo.png?v=2' },
     ],
   },
   manifest: '/site.webmanifest',
@@ -108,10 +108,10 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning className={`${cinzel.variable} ${inter.variable}`}>
       <head>
-        <link rel="icon" href="/icon.png" type="image/png" sizes="any" />
-        <link rel="icon" href="/logo.png" type="image/png" />
-        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-        <link rel="shortcut icon" href="/favicon.ico" />
+        <link rel="icon" href="/logo.png?v=2" type="image/png" />
+        <link rel="icon" href="/icon.png?v=2" type="image/png" sizes="any" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=2" />
+        <link rel="shortcut icon" href="/favicon.ico?v=2" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
