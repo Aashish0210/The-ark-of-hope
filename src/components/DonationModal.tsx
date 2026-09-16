@@ -31,10 +31,10 @@ export default function DonationModal({ isOpen, onClose, initialAmount }: Donati
 
   const bankDetails = {
     international: {
-      bankName: "Nepal SBI Bank",
-      branch: "Kupondole",
-      accountName: "Revival Zahaz Pvt.Ltd.",
-      accountNumber: "108010010000602",
+      bankName: "Nepal SBI Bank Ltd",
+      branch: "Patan Branch, Lalitpur, Nepal",
+      accountName: "Shanti Foundation Trust",
+      accountNumber: "20225240200633",
       swift: "NSBINPKA",
     }
   };
@@ -99,7 +99,7 @@ export default function DonationModal({ isOpen, onClose, initialAmount }: Donati
                   <div><strong className="text-black block mb-1">STEP 3 — Click “Send Money”</strong>Button usually says: “Send”, “Transfer Money”, or “Send Internationally”</div>
                   <div><strong className="text-black block mb-1">STEP 4 — Select Receiving Country</strong>Sender chooses: Receiving Country: Nepal</div>
                   <div><strong className="text-black block mb-1">STEP 5 — Choose Delivery Method</strong>Sender selects: Send to: Bank Account</div>
-                  <div className="bg-slate-50 p-5 rounded-lg border border-slate-200 shadow-sm"><strong className="text-black block mb-3 text-base">STEP 6 — Enter Receiver Details</strong><span className="mb-2 block">Sender copies these details exactly:</span><ul className="space-y-1 ml-2"><li>Receiver Name: <strong className="text-black">Revival Zahaz Pvt. Ltd.</strong></li><li>Purpose: <strong className="text-black">Ark Building</strong></li><li>Bank Name: <strong className="text-black">Nepal SBI Bank</strong></li><li>Branch: <strong className="text-black">Kupondole</strong></li><li>Account Number: <strong className="text-black">108010010000602</strong></li><li>SWIFT Code: <strong className="text-black">NSBINPKA</strong></li><li>Country: <strong className="text-black">Nepal</strong></li></ul></div>
+                  <div className="bg-slate-50 p-5 rounded-lg border border-slate-200 shadow-sm"><strong className="text-black block mb-3 text-base">STEP 6 — Enter Receiver Details</strong><span className="mb-2 block">Sender copies these details exactly:</span><ul className="space-y-1 ml-2"><li>Receiver Name: <strong className="text-black">Shanti Foundation Trust</strong></li><li>Purpose: <strong className="text-black">Ark Building</strong></li><li>Bank Name: <strong className="text-black">Nepal SBI Bank Ltd</strong></li><li>Branch: <strong className="text-black">Patan Branch, Lalitpur, Nepal</strong></li><li>Account Number: <strong className="text-black">20225240200633</strong></li><li>SWIFT Code: <strong className="text-black">NSBINPKA</strong></li><li>Country: <strong className="text-black">Nepal</strong></li></ul></div>
                   <div><strong className="text-black block mb-1">STEP 7 — Enter Amount</strong>Example: Amount to Send: $100 USD<br/>The system shows: Transfer fee, Exchange rate, Amount received in NPR</div>
                   <div><strong className="text-black block mb-1">STEP 8 — Review Details Carefully</strong>Sender checks: Receiver name spelling, Account number, SWIFT code, Amount</div>
                   <div><strong className="text-black block mb-1">STEP 9 — Pay for the Transfer</strong>Sender pays using: Debit card, Credit card, Bank account</div>
@@ -113,7 +113,7 @@ export default function DonationModal({ isOpen, onClose, initialAmount }: Donati
                     <label className="text-[10px] text-gold uppercase tracking-widest font-bold">Account Holder Name</label>
                     <div className="flex justify-between items-center group">
                       <span className="text-white font-medium">{bankDetails.international.accountName}</span>
-                      <button onClick={() => handleCopy(bankDetails.international.accountName, 'Name')} className="text-white/30 hover:text-gold transition-colors p-1">
+                      <button onClick={() => handleCopy(bankDetails.international.accountName, 'Name')} className="text-white/30 hover:text-gold transition-colors p-1" title="Copy Account Name">
                         {copied === 'Name' ? '✓' : <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>}
                       </button>
                     </div>
@@ -123,7 +123,7 @@ export default function DonationModal({ isOpen, onClose, initialAmount }: Donati
                     <label className="text-[10px] text-gold uppercase tracking-widest font-bold">Account Number</label>
                     <div className="flex justify-between items-center group">
                       <span className="text-white font-mono text-lg">{bankDetails.international.accountNumber}</span>
-                      <button onClick={() => handleCopy(bankDetails.international.accountNumber, 'Account')} className="text-white/30 hover:text-gold transition-colors p-1">
+                      <button onClick={() => handleCopy(bankDetails.international.accountNumber, 'Account')} className="text-white/30 hover:text-gold transition-colors p-1" title="Copy Account Number">
                         {copied === 'Account' ? '✓' : <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>}
                       </button>
                     </div>
@@ -131,17 +131,22 @@ export default function DonationModal({ isOpen, onClose, initialAmount }: Donati
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                     <div className="flex flex-col gap-1">
-                       <label className="text-[10px] text-gold uppercase tracking-widest font-bold">SWIFT/BIC Code</label>
-                       <div className="flex justify-between items-center group">
-                        <span className="text-white font-mono">{bankDetails.international.swift}</span>
-                        <button onClick={() => handleCopy(bankDetails.international.swift, 'SWIFT')} className="text-white/30 hover:text-gold transition-colors p-1">
-                          {copied === 'SWIFT' ? '✓' : <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>}
-                        </button>
-                      </div>
-                    </div>
-                    <div className="flex flex-col gap-1">
                        <label className="text-[10px] text-gold uppercase tracking-widest font-bold">Bank Name</label>
                        <span className="text-white font-medium">{bankDetails.international.bankName}</span>
+                    </div>
+                    <div className="flex flex-col gap-1">
+                       <label className="text-[10px] text-gold uppercase tracking-widest font-bold">Branch</label>
+                       <span className="text-white font-medium">{bankDetails.international.branch}</span>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col gap-1">
+                    <label className="text-[10px] text-gold uppercase tracking-widest font-bold">SWIFT/BIC Code</label>
+                    <div className="flex justify-between items-center group">
+                      <span className="text-white font-mono">{bankDetails.international.swift}</span>
+                      <button onClick={() => handleCopy(bankDetails.international.swift, 'SWIFT')} className="text-white/30 hover:text-gold transition-colors p-1" title="Copy SWIFT Code">
+                        {copied === 'SWIFT' ? '✓' : <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>}
+                      </button>
                     </div>
                   </div>
                 </div>
