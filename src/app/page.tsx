@@ -8,6 +8,7 @@ import {
 import CardGallery from "@/components/CardGallery";
 import ProgressTracker from "@/components/ProgressTracker";
 import Contact from "@/components/Contact";
+import Footer from "@/components/Footer";
 import { prisma } from "@/lib/prisma";
 
 export const revalidate = 0; // Disable static rendering to always show fresh data
@@ -25,7 +26,7 @@ export default async function Home() {
 
   const settings = rawSettings || {
     raised: 0,
-    goal: 9000000,
+    goal: 7000000,
     heroTitle: "Ark of Hope Project",
     heroSubtitle: "A story of faith in Nepal",
     heroText:
@@ -46,6 +47,7 @@ export default async function Home() {
       <ProgressTracker raised={settings.raised} goal={settings.goal} />
       <TheStoryPart3 />
       <Contact />
+      <Footer />
     </main>
   );
 }

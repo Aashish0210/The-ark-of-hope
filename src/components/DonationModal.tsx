@@ -31,11 +31,11 @@ export default function DonationModal({ isOpen, onClose, initialAmount }: Donati
 
   const bankDetails = {
     international: {
-      bankName: "Sanima Bank",
+      bankName: "Nepal SBI Bank",
       branch: "Kupondole",
       accountName: "Revival Zahaz Pvt.Ltd.",
       accountNumber: "108010010000602",
-      swift: "SNMANPKA",
+      swift: "NSBINPKA",
     }
   };
 
@@ -99,7 +99,7 @@ export default function DonationModal({ isOpen, onClose, initialAmount }: Donati
                   <div><strong className="text-black block mb-1">STEP 3 — Click “Send Money”</strong>Button usually says: “Send”, “Transfer Money”, or “Send Internationally”</div>
                   <div><strong className="text-black block mb-1">STEP 4 — Select Receiving Country</strong>Sender chooses: Receiving Country: Nepal</div>
                   <div><strong className="text-black block mb-1">STEP 5 — Choose Delivery Method</strong>Sender selects: Send to: Bank Account</div>
-                  <div className="bg-slate-50 p-5 rounded-lg border border-slate-200 shadow-sm"><strong className="text-black block mb-3 text-base">STEP 6 — Enter Receiver Details</strong><span className="mb-2 block">Sender copies these details exactly:</span><ul className="space-y-1 ml-2"><li>Receiver Name: <strong className="text-black">Revival Zahaz Pvt. Ltd.</strong></li><li>Purpose: <strong className="text-black">Ark Building</strong></li><li>Bank Name: <strong className="text-black">Sanima Bank</strong></li><li>Branch: <strong className="text-black">Kupondole</strong></li><li>Account Number: <strong className="text-black">108010010000602</strong></li><li>SWIFT Code: <strong className="text-black">SNMANPKA</strong></li><li>Country: <strong className="text-black">Nepal</strong></li></ul></div>
+                  <div className="bg-slate-50 p-5 rounded-lg border border-slate-200 shadow-sm"><strong className="text-black block mb-3 text-base">STEP 6 — Enter Receiver Details</strong><span className="mb-2 block">Sender copies these details exactly:</span><ul className="space-y-1 ml-2"><li>Receiver Name: <strong className="text-black">Revival Zahaz Pvt. Ltd.</strong></li><li>Purpose: <strong className="text-black">Ark Building</strong></li><li>Bank Name: <strong className="text-black">Nepal SBI Bank</strong></li><li>Branch: <strong className="text-black">Kupondole</strong></li><li>Account Number: <strong className="text-black">108010010000602</strong></li><li>SWIFT Code: <strong className="text-black">NSBINPKA</strong></li><li>Country: <strong className="text-black">Nepal</strong></li></ul></div>
                   <div><strong className="text-black block mb-1">STEP 7 — Enter Amount</strong>Example: Amount to Send: $100 USD<br/>The system shows: Transfer fee, Exchange rate, Amount received in NPR</div>
                   <div><strong className="text-black block mb-1">STEP 8 — Review Details Carefully</strong>Sender checks: Receiver name spelling, Account number, SWIFT code, Amount</div>
                   <div><strong className="text-black block mb-1">STEP 9 — Pay for the Transfer</strong>Sender pays using: Debit card, Credit card, Bank account</div>

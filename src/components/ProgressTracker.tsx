@@ -7,9 +7,9 @@ interface ProgressProps {
     goal: number;
 }
 
-export default function ProgressTracker({ raised = 0, goal = 9000000 }: ProgressProps) {
+export default function ProgressTracker({ raised = 0, goal = 7000000 }: ProgressProps) {
     const safeRaised = Number.isFinite(Number(raised)) ? Number(raised) : 0;
-    const safeGoal = Number.isFinite(Number(goal)) && Number(goal) > 0 ? Number(goal) : 9000000;
+    const safeGoal = Number.isFinite(Number(goal)) && Number(goal) > 0 ? Number(goal) : 7000000;
 
     const [currentRaised, setCurrentRaised] = useState(safeRaised);
     const [displayRaised, setDisplayRaised] = useState(0);
@@ -168,9 +168,9 @@ export default function ProgressTracker({ raised = 0, goal = 9000000 }: Progress
 
                 <div className="flex justify-between text-text-muted text-[10px] md:text-xs font-semibold mt-4 px-1">
                     <span>$0</span>
-                    <span>$3M</span>
-                    <span>$6M</span>
-                    <span>$9M</span>
+                    <span>$2.5M</span>
+                    <span>$5M</span>
+                    <span>${safeGoal.toLocaleString('en-US', { notation: 'compact', maximumFractionDigits: 1 })}</span>
                 </div>
 
                 {/* Animated Ark Layers */}
