@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useDonation } from "./DonationProvider";
 
 export default function Navbar() {
@@ -30,8 +31,16 @@ export default function Navbar() {
         <div className="max-w-[1200px] w-full mx-auto px-4 sm:px-6 flex justify-between items-center gap-2 min-w-0">
           <Link
             href="/"
-            className="flex items-center gap-1.5 sm:gap-2 no-underline text-[13px] sm:text-[17px] md:text-xl font-bold tracking-wider sm:tracking-widest heading-font drop-shadow-[0_0_8px_rgba(201,148,58,0.3)] leading-tight shrink-0"
+            className="flex items-center gap-2 sm:gap-2.5 no-underline text-[13px] sm:text-[17px] md:text-xl font-bold tracking-wider sm:tracking-widest heading-font drop-shadow-[0_0_8px_rgba(201,148,58,0.3)] leading-tight shrink-0 group"
           >
+            <Image
+              src="/logo.png"
+              alt="Ark of Hope Project"
+              width={34}
+              height={34}
+              className="w-7 h-7 sm:w-8 sm:h-8 rounded-full object-cover border border-gold/40 shadow-sm group-hover:scale-105 transition-transform"
+              priority
+            />
             <span className="text-white whitespace-nowrap">ARK OF HOPE</span>
             <span className="text-gold shrink-0">PROJECT</span>
           </Link>

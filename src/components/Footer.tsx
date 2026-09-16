@@ -2,6 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useDonation } from "./DonationProvider";
 
 export default function Footer() {
@@ -89,10 +90,19 @@ export default function Footer() {
           <div className="md:col-span-5 space-y-4">
             <Link
               href="/"
-              className="inline-flex items-center gap-2 text-xl font-bold tracking-widest heading-font drop-shadow-[0_0_8px_rgba(201,148,58,0.3)] no-underline"
+              className="inline-flex items-center gap-3 text-xl font-bold tracking-widest heading-font drop-shadow-[0_0_8px_rgba(201,148,58,0.3)] no-underline group"
             >
-              <span className="text-white">ARK OF HOPE</span>
-              <span className="text-gold">PROJECT</span>
+              <Image
+                src="/logo.png"
+                alt="Ark of Hope Project Logo"
+                width={44}
+                height={44}
+                className="w-10 h-10 sm:w-11 sm:h-11 rounded-full object-cover border border-gold/50 shadow-md group-hover:scale-105 transition-transform"
+              />
+              <span className="flex items-center gap-1.5">
+                <span className="text-white">ARK OF HOPE</span>
+                <span className="text-gold">PROJECT</span>
+              </span>
             </Link>
             <p className="text-text-muted text-sm leading-relaxed max-w-[380px]">
               A monumental faith initiative in Chitwan, Nepal—creating a life-sized experience of God&apos;s love, family restoration, and living hope for generations to come.
