@@ -58,10 +58,10 @@ export default function AdminPage() {
         async function fetchData() {
             try {
                 const [resSettings, resTiers, resStats, resTrends] = await Promise.all([
-                    fetch('/api/settings'),
-                    fetch('/api/tiers'),
-                    fetch('/api/stats'),
-                    fetch('/api/trend')
+                    fetch('/api/settings', { cache: 'no-store' }),
+                    fetch('/api/tiers', { cache: 'no-store' }),
+                    fetch('/api/stats', { cache: 'no-store' }),
+                    fetch('/api/trend', { cache: 'no-store' })
                 ]);
 
                 if (resSettings.ok) setSettings(await resSettings.json());
@@ -69,7 +69,7 @@ export default function AdminPage() {
                 if (resStats.ok) setStats(await resStats.json());
                 if (resTrends.ok) setTrends(await resTrends.json());
 
-                const resProfile = await fetch('/api/admin/profile');
+                const resProfile = await fetch('/api/admin/profile', { cache: 'no-store' });
                 if (resProfile.ok) {
                     const profileData = await resProfile.json();
                     if (profileData) {
@@ -204,7 +204,8 @@ export default function AdminPage() {
                 setSettings(updated);
                 showToast('Site settings updated successfully!');
             } else {
-                showToast('Failed to save settings.', 'error');
+                const errorData = await res.json().catch(() => ({}));
+                showToast(errorData.details || errorData.error || 'Failed to save settings.', 'error');
             }
         } catch (error) {
             showToast('Error saving settings.', 'error');
@@ -221,7 +222,8 @@ export default function AdminPage() {
             if (res.ok) {
                 showToast(`Tier "${tier.name}" saved!`);
             } else {
-                showToast(`Failed to save tier ${tier.name}`, 'error');
+                const errorData = await res.json().catch(() => ({}));
+                showToast(errorData.details || errorData.error || `Failed to save tier ${tier.name}`, 'error');
             }
         } catch (error) {
             showToast(`Error saving tier`, 'error');
@@ -238,7 +240,8 @@ export default function AdminPage() {
             if (res.ok) {
                 showToast(`Stat updated!`);
             } else {
-                showToast(`Failed to update stat`, 'error');
+                const errorData = await res.json().catch(() => ({}));
+                showToast(errorData.details || errorData.error || `Failed to update stat`, 'error');
             }
         } catch (error) {
             showToast('Error updating stat', 'error');

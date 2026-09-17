@@ -1,13 +1,36 @@
 import { PrismaClient } from '@prisma/client';
 import { createClient } from '@libsql/client';
 import path from 'path';
+import fs from 'fs';
 import bcrypt from 'bcryptjs';
 
-const hasDatabaseUrl = Boolean(process.env.POSTGRES_URL);
+const databaseUrl =
+  process.env.POSTGRES_URL ||
+  process.env.DATABASE_URL ||
+  process.env.POSTGRES_PRISMA_URL ||
+  process.env.POSTGRES_URL_NON_POOLING;
+
+const hasDatabaseUrl = Boolean(databaseUrl);
+
+if (hasDatabaseUrl && databaseUrl) {
+  process.env.POSTGRES_URL = databaseUrl;
+  process.env.DATABASE_URL = databaseUrl;
+}
 
 // SQLite Local Persistent Fallback
 function createSqlitePrisma() {
-  const dbPath = path.join(process.cwd(), 'dev.db');
+  // On Vercel / serverless lambdas, process.cwd() is read-only. Fall back to /tmp/dev.db if needed.
+  let dbPath = path.join(process.cwd(), 'dev.db');
+  if (process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME) {
+    dbPath = path.join('/tmp', 'dev.db');
+    const localSeedDb = path.join(process.cwd(), 'dev.db');
+    if (fs.existsSync(localSeedDb) && !fs.existsSync(dbPath)) {
+      try {
+        fs.copyFileSync(localSeedDb, dbPath);
+      } catch (_) {}
+    }
+  }
+
   const client = createClient({ url: `file:${dbPath}` });
 
   let isInitialized = false;
@@ -506,7 +529,13 @@ const globalForPrisma = globalThis as typeof globalThis & {
 };
 
 export const prisma: any = hasDatabaseUrl
-  ? (globalForPrisma.prisma ?? new PrismaClient())
+  ? (globalForPrisma.prisma ?? new PrismaClient({
+      datasources: {
+        db: {
+          url: databaseUrl
+        }
+      }
+    }))
   : (globalForPrisma.prisma ?? createSqlitePrisma());
 
 if (process.env.NODE_ENV !== 'production') {

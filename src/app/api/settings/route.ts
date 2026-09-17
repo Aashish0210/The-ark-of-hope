@@ -3,9 +3,14 @@ import { prisma } from '@/lib/prisma';
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export async function GET() {
     try {
-        let settings = await prisma.siteSettings.findFirst();
+        let settings = await prisma.siteSettings.findFirst({
+            orderBy: { id: 'asc' }
+        });
         if (!settings) {
             settings = await prisma.siteSettings.create({
                 data: {
@@ -19,7 +24,11 @@ export async function GET() {
                 }
             });
         }
-        return NextResponse.json(settings);
+        return NextResponse.json(settings, {
+            headers: {
+                'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate'
+            }
+        });
     } catch (error) {
         console.error('Fetch settings error:', error);
         return NextResponse.json({ error: 'Failed to fetch settings' }, { status: 500 });
@@ -48,19 +57,29 @@ export async function PUT(req: Request) {
         if (heroText !== undefined) updateData.heroText = String(heroText);
         if (maintenanceMode !== undefined) updateData.maintenanceMode = Boolean(maintenanceMode);
 
-        const settings = await prisma.siteSettings.upsert({
-            where: { id: 1 },
-            update: updateData,
-            create: {
-                id: 1,
-                raised: updateData.raised ?? 0,
-                goal: updateData.goal ?? 7000000,
-                heroTitle: updateData.heroTitle ?? 'Ark of Hope Project',
-                heroSubtitle: updateData.heroSubtitle ?? 'A story of faith in Nepal',
-                heroText: updateData.heroText ?? 'Every great journey begins with a single plank. Once gifted for the Ark, see the work, and please be ready—one donation at a time.',
-                maintenanceMode: updateData.maintenanceMode ?? false
-            }
+        const existing = await prisma.siteSettings.findFirst({
+            orderBy: { id: 'asc' }
         });
+
+        let settings;
+        if (existing) {
+            settings = await prisma.siteSettings.update({
+                where: { id: existing.id },
+                data: updateData
+            });
+        } else {
+            settings = await prisma.siteSettings.create({
+                data: {
+                    id: 1,
+                    raised: updateData.raised ?? 0,
+                    goal: updateData.goal ?? 7000000,
+                    heroTitle: updateData.heroTitle ?? 'Ark of Hope Project',
+                    heroSubtitle: updateData.heroSubtitle ?? 'A story of faith in Nepal',
+                    heroText: updateData.heroText ?? 'Every great journey begins with a single plank. Once gifted for the Ark, see the work, and please be ready—one donation at a time.',
+                    maintenanceMode: updateData.maintenanceMode ?? false
+                }
+            });
+        }
 
         // Trigger real-time update via Pusher if raised amount was modified
         if (updateData.raised !== undefined) {
