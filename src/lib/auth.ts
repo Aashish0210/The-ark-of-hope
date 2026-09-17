@@ -3,6 +3,8 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 
+const DEFAULT_SECRET = "the-ark-of-hope-secret-key-production-development-auth-token-hash-2026";
+
 export const authOptions: NextAuthOptions = {
     providers: [
         CredentialsProvider({
@@ -17,7 +19,7 @@ export const authOptions: NextAuthOptions = {
                 }
 
                 const user = await prisma.user.findUnique({
-                    where: { email: credentials.email }
+                    where: { email: credentials.email.trim().toLowerCase() }
                 });
 
                 if (!user) {
@@ -39,6 +41,7 @@ export const authOptions: NextAuthOptions = {
     ],
     pages: {
         signIn: "/admin/login",
+        error: "/admin/login",
     },
     session: {
         strategy: "jwt",
@@ -57,5 +60,5 @@ export const authOptions: NextAuthOptions = {
             return session;
         },
     },
-    secret: process.env.NEXTAUTH_SECRET,
+    secret: process.env.NEXTAUTH_SECRET || DEFAULT_SECRET,
 };
