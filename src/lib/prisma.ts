@@ -97,7 +97,7 @@ function createSqlitePrisma() {
       });
 
       if (userRes.rows.length === 0) {
-        const hashedPassword = await bcrypt.hash('admin123', 10);
+        const hashedPassword = await bcrypt.hash('arkproject@2026', 10);
         await client.execute({
           sql: `INSERT INTO User (email, password) VALUES (?, ?)`,
           args: ['admin@ark.com', hashedPassword]

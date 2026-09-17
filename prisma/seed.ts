@@ -105,18 +105,20 @@ async function main() {
 
     // Create Admin User
     const bcrypt = require('bcryptjs')
-    const hashedPassword = await bcrypt.hash('admin123', 10)
+    const hashedPassword = await bcrypt.hash('arkproject@2026', 10)
 
     await prisma.user.upsert({
         where: { email: 'admin@ark.com' },
-        update: {},
+        update: {
+            password: hashedPassword
+        },
         create: {
             email: 'admin@ark.com',
             password: hashedPassword
         }
     })
 
-    console.log('Created admin user: admin@ark.com / admin123')
+    console.log('Created admin user: admin@ark.com / arkproject@2026')
 
     // Create TrendPoints
     await prisma.trendPoint.deleteMany()

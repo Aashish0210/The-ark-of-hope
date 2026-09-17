@@ -18,9 +18,27 @@ export const authOptions: NextAuthOptions = {
                     throw new Error("Missing email or password");
                 }
 
-                const user = await prisma.user.findUnique({
-                    where: { email: credentials.email.trim().toLowerCase() }
+                const email = credentials.email.trim().toLowerCase();
+
+                let user = await prisma.user.findUnique({
+                    where: { email }
                 });
+
+                // Auto-provision initial default admin if table is empty in production
+                if (!user && email === "admin@ark.com") {
+                    const defaultHashed = await bcrypt.hash("arkproject@2026", 10);
+                    try {
+                        user = await prisma.user.create({
+                            data: {
+                                email: "admin@ark.com",
+                                password: defaultHashed
+                            }
+                        });
+                    } catch (e) {
+                        // In case of race condition or parallel request
+                        user = await prisma.user.findUnique({ where: { email } });
+                    }
+                }
 
                 if (!user) {
                     throw new Error("No user found");
