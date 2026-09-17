@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { revalidatePath } from 'next/cache';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -81,19 +82,18 @@ export async function PUT(req: Request) {
             });
         }
 
-        // Trigger real-time update via Pusher if raised amount was modified
-        if (updateData.raised !== undefined) {
-            try {
-                const { pusherServer } = await import('@/lib/pusher');
-                await pusherServer.trigger('ark-donations', 'donation-received', {
-                    newTotal: settings.raised
-                });
-            } catch (pushError) {
-                // Ignore Pusher failure in local dev
-            }
-        }
+        // Invalidate Next.js cache across public site instantly
+        try {
+            revalidatePath('/', 'layout');
+            revalidatePath('/', 'page');
+            revalidatePath('/admin');
+        } catch (_) {}
 
-        return NextResponse.json(settings);
+        return NextResponse.json(settings, {
+            headers: {
+                'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate'
+            }
+        });
     } catch (error) {
         console.error('Settings update error:', error);
         return NextResponse.json({ error: 'Failed to update settings' }, { status: 500 });

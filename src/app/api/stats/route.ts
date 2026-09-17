@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { revalidatePath } from 'next/cache';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -11,7 +12,11 @@ export async function GET() {
         const stats = await prisma.stat.findMany({
             orderBy: { order: 'asc' }
         });
-        return NextResponse.json(stats);
+        return NextResponse.json(stats, {
+            headers: {
+                'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate'
+            }
+        });
     } catch (error) {
         return NextResponse.json({ error: 'Failed to fetch stats' }, { status: 500 });
     }
@@ -32,6 +37,10 @@ export async function POST(req: Request) {
                 order: statsCount + 1
             }
         });
+
+        try {
+            revalidatePath('/', 'layout');
+        } catch (_) {}
 
         return NextResponse.json(stat);
     } catch (error) {
@@ -58,6 +67,10 @@ export async function PUT(req: Request) {
             }
         });
 
+        try {
+            revalidatePath('/', 'layout');
+        } catch (_) {}
+
         return NextResponse.json(stat);
     } catch (error) {
         console.error(error);
@@ -82,6 +95,10 @@ export async function DELETE(req: Request) {
         await prisma.stat.delete({
             where: { id: Number(id) }
         });
+
+        try {
+            revalidatePath('/', 'layout');
+        } catch (_) {}
 
         return NextResponse.json({ success: true });
     } catch (error) {

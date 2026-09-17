@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { revalidatePath } from 'next/cache';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -11,7 +12,11 @@ export async function GET() {
         const tiers = await prisma.donationTier.findMany({
             orderBy: { price: 'asc' }
         });
-        return NextResponse.json(tiers);
+        return NextResponse.json(tiers, {
+            headers: {
+                'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate'
+            }
+        });
     } catch (error) {
         return NextResponse.json({ error: 'Failed to fetch tiers' }, { status: 500 });
     }
@@ -39,6 +44,10 @@ export async function PUT(req: Request) {
                 isPopular: isPopular !== undefined ? Boolean(isPopular) : undefined,
             }
         });
+
+        try {
+            revalidatePath('/', 'layout');
+        } catch (_) {}
 
         return NextResponse.json(tier);
     } catch (error) {

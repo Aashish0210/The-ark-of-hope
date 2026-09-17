@@ -26,10 +26,22 @@ export default function ProgressTracker({ raised = 0, goal = 7000000 }: Progress
         setCurrentRaised(safeRaised);
     }, [safeRaised]);
 
-    // WebSocket Real-time logic
+    // Continuous live sync & WebSocket logic
     useEffect(() => {
         let channel: any;
         let pusher: any;
+
+        const fetchLatest = async () => {
+            try {
+                const res = await fetch('/api/settings', { cache: 'no-store' });
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data?.raised !== undefined) {
+                        setCurrentRaised(Number(data.raised));
+                    }
+                }
+            } catch (_) {}
+        };
 
         const initPusher = async () => {
             try {
@@ -42,14 +54,27 @@ export default function ProgressTracker({ raised = 0, goal = 7000000 }: Progress
                         setCurrentRaised(Number(data.newTotal));
                     }
                 });
-            } catch (err) {
-                // Pusher optional
-            }
+            } catch (_) {}
         };
 
         initPusher();
 
+        // 3-second live poll for instantaneous updates on production
+        const intervalId = setInterval(fetchLatest, 3000);
+
+        const handleVisibilityOrFocus = () => {
+            if (document.visibilityState === 'visible') {
+                fetchLatest();
+            }
+        };
+
+        window.addEventListener('focus', handleVisibilityOrFocus);
+        document.addEventListener('visibilitychange', handleVisibilityOrFocus);
+
         return () => {
+            clearInterval(intervalId);
+            window.removeEventListener('focus', handleVisibilityOrFocus);
+            document.removeEventListener('visibilitychange', handleVisibilityOrFocus);
             if (channel) {
                 channel.unbind_all();
                 channel.unsubscribe();
