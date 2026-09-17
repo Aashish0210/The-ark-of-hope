@@ -1,14 +1,21 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 import { useDonation } from './DonationProvider';
 
 export default function ExitIntentOverlay() {
     const { openDonation } = useDonation();
+    const pathname = usePathname();
     const [isVisible, setIsVisible] = useState(false);
     const [hasTriggered, setHasTriggered] = useState(false);
 
+    // Disable exit intent overlay entirely on admin routes
+    const isAdminRoute = pathname?.startsWith('/admin');
+
     useEffect(() => {
+        if (isAdminRoute) return;
+
         // Check if we've already shown it this session
         const sessionShown = sessionStorage.getItem('exit_intent_shown');
         if (sessionShown) {
@@ -26,9 +33,9 @@ export default function ExitIntentOverlay() {
 
         document.addEventListener('mouseleave', handleMouseLeave);
         return () => document.removeEventListener('mouseleave', handleMouseLeave);
-    }, [hasTriggered]);
+    }, [hasTriggered, isAdminRoute]);
 
-    if (!isVisible) return null;
+    if (isAdminRoute || !isVisible) return null;
 
     return (
         <div className="fixed inset-0 z-[1000] flex items-center justify-center p-6 bg-black/80 backdrop-blur-sm animate-[fadeIn_0.3s_ease-out]">

@@ -5,9 +5,23 @@ import { authOptions } from "@/lib/auth";
 
 export async function GET() {
     try {
-        const settings = await prisma.siteSettings.findFirst();
+        let settings = await prisma.siteSettings.findFirst();
+        if (!settings) {
+            settings = await prisma.siteSettings.create({
+                data: {
+                    id: 1,
+                    raised: 0,
+                    goal: 7000000,
+                    heroTitle: "Ark of Hope Project",
+                    heroSubtitle: "A story of faith in Nepal",
+                    heroText: "Every great journey begins with a single plank. Once gifted for the Ark, see the work, and please be ready—one donation at a time.",
+                    maintenanceMode: false
+                }
+            });
+        }
         return NextResponse.json(settings);
     } catch (error) {
+        console.error('Fetch settings error:', error);
         return NextResponse.json({ error: 'Failed to fetch settings' }, { status: 500 });
     }
 }
@@ -20,23 +34,49 @@ export async function PUT(req: Request) {
         }
 
         const body = await req.json();
-        const { raised, goal, heroTitle, heroSubtitle, heroText } = body;
+        const { raised, goal, heroTitle, heroSubtitle, heroText, maintenanceMode } = body;
 
-        // We assume setting id=1 always exists because of the seed
-        const settings = await prisma.siteSettings.update({
+        const updateData: any = {};
+        if (raised !== undefined && raised !== null && !isNaN(Number(raised))) {
+            updateData.raised = parseFloat(raised);
+        }
+        if (goal !== undefined && goal !== null && !isNaN(Number(goal))) {
+            updateData.goal = parseFloat(goal);
+        }
+        if (heroTitle !== undefined) updateData.heroTitle = String(heroTitle);
+        if (heroSubtitle !== undefined) updateData.heroSubtitle = String(heroSubtitle);
+        if (heroText !== undefined) updateData.heroText = String(heroText);
+        if (maintenanceMode !== undefined) updateData.maintenanceMode = Boolean(maintenanceMode);
+
+        const settings = await prisma.siteSettings.upsert({
             where: { id: 1 },
-            data: {
-                raised: raised ? parseFloat(raised) : undefined,
-                goal: goal ? parseFloat(goal) : undefined,
-                heroTitle,
-                heroSubtitle,
-                heroText
+            update: updateData,
+            create: {
+                id: 1,
+                raised: updateData.raised ?? 0,
+                goal: updateData.goal ?? 7000000,
+                heroTitle: updateData.heroTitle ?? 'Ark of Hope Project',
+                heroSubtitle: updateData.heroSubtitle ?? 'A story of faith in Nepal',
+                heroText: updateData.heroText ?? 'Every great journey begins with a single plank. Once gifted for the Ark, see the work, and please be ready—one donation at a time.',
+                maintenanceMode: updateData.maintenanceMode ?? false
             }
         });
 
+        // Trigger real-time update via Pusher if raised amount was modified
+        if (updateData.raised !== undefined) {
+            try {
+                const { pusherServer } = await import('@/lib/pusher');
+                await pusherServer.trigger('ark-donations', 'donation-received', {
+                    newTotal: settings.raised
+                });
+            } catch (pushError) {
+                // Ignore Pusher failure in local dev
+            }
+        }
+
         return NextResponse.json(settings);
     } catch (error) {
-        console.error(error);
+        console.error('Settings update error:', error);
         return NextResponse.json({ error: 'Failed to update settings' }, { status: 500 });
     }
 }

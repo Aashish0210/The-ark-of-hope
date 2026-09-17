@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { writeFile } from 'fs/promises';
+import { writeFile, mkdir } from 'fs/promises';
 import { join } from 'path';
 import { getServerSession } from 'next-auth';
 import { authOptions } from "@/lib/auth";
@@ -22,12 +22,16 @@ export async function POST(request: NextRequest) {
         const bytes = await file.arrayBuffer();
         const buffer = Buffer.from(bytes);
 
-        // Create a unique filename
-        const filename = `${Date.now()}-${file.name.replace(/\s+/g, '-')}`;
-        const path = join(process.cwd(), 'public/uploads', filename);
+        const uploadDir = join(process.cwd(), 'public/uploads');
+        await mkdir(uploadDir, { recursive: true });
 
-        await writeFile(path, buffer);
-        console.log(`File uploaded to ${path}`);
+        // Create a unique filename
+        const cleanName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+        const filename = `${Date.now()}-${cleanName}`;
+        const filePath = join(uploadDir, filename);
+
+        await writeFile(filePath, buffer);
+        console.log(`File uploaded to ${filePath}`);
 
         return NextResponse.json({
             success: true,

@@ -21,7 +21,7 @@ export default function ProgressTracker({ raised = 0, goal = 7000000 }: Progress
         setMounted(true);
     }, []);
 
-    // Initial sync
+    // Sync with prop changes
     useEffect(() => {
         setCurrentRaised(safeRaised);
     }, [safeRaised]);
@@ -39,11 +39,11 @@ export default function ProgressTracker({ raised = 0, goal = 7000000 }: Progress
 
                 channel.bind('donation-received', (data: any) => {
                     if (data.newTotal !== undefined) {
-                        setCurrentRaised(data.newTotal);
+                        setCurrentRaised(Number(data.newTotal));
                     }
                 });
             } catch (err) {
-                console.error("Pusher subscription failed in ProgressTracker", err);
+                // Pusher optional
             }
         };
 
@@ -66,7 +66,7 @@ export default function ProgressTracker({ raised = 0, goal = 7000000 }: Progress
                 setInView(true);
                 observer.disconnect();
             }
-        }, { threshold: 0.2 });
+        }, { threshold: 0.15 });
 
         if (sectionRef.current) {
             observer.observe(sectionRef.current);
@@ -80,20 +80,24 @@ export default function ProgressTracker({ raised = 0, goal = 7000000 }: Progress
 
         let animationFrameId: number;
         let startTime: number | null = null;
-        const duration = 2000; // 2 seconds
+        const duration = 1800; // 1.8s smooth count-up
+
+        const startVal = displayRaised;
+        const targetVal = currentRaised;
 
         const animate = (timestamp: number) => {
             if (!startTime) startTime = timestamp;
-            const progress = Math.min((timestamp - startTime) / duration, 1);
+            const elapsed = timestamp - startTime;
+            const progress = Math.min(elapsed / duration, 1);
 
             // easeOutExpo
             const easeOut = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
-            setDisplayRaised(Math.floor(easeOut * currentRaised));
+            setDisplayRaised(Math.floor(startVal + (targetVal - startVal) * easeOut));
 
             if (progress < 1) {
                 animationFrameId = window.requestAnimationFrame(animate);
             } else {
-                setDisplayRaised(currentRaised);
+                setDisplayRaised(targetVal);
             }
         };
 
@@ -102,22 +106,19 @@ export default function ProgressTracker({ raised = 0, goal = 7000000 }: Progress
         return () => window.cancelAnimationFrame(animationFrameId);
     }, [inView, currentRaised]);
 
-    // Set percentage dynamically based on view triggering the SVG and bar animations simultaneously
-    const percentage = inView ? Math.min((currentRaised / safeGoal) * 100, 100) : 0;
+    // Percentage of progress
+    const percentage = inView ? Math.min(Math.max((currentRaised / safeGoal) * 100, 0), 100) : 0;
 
-    // Shared transform logic for synced alignment
-    const hullTransform = {
-        transform: percentage >= 40 ? 'translateY(0)' : 'translateY(55px)',
-        transition: 'transform 0.9s ease'
-    };
-    const deckTransform = {
-        transform: percentage >= 70 ? 'translateY(0)' : 'translateY(42px)',
-        transition: 'transform 0.9s ease'
-    };
-    const houseTransform = {
-        transform: percentage >= 100 ? 'translateY(0)' : 'translateY(-80px)',
-        transition: 'transform 0.9s cubic-bezier(0.34, 1.4, 0.64, 1)'
-    };
+    const formattedRaised = displayRaised >= 1000000
+        ? `$${(displayRaised / 1000000).toFixed(displayRaised % 1000000 === 0 ? 0 : 2)}M`
+        : `$${displayRaised.toLocaleString('en-US')}`;
+
+    const formattedGoal = safeGoal >= 1000000
+        ? `$${(safeGoal / 1000000).toFixed(safeGoal % 1000000 === 0 ? 0 : 1)}M`
+        : `$${safeGoal.toLocaleString('en-US')}`;
+
+    const m1 = safeGoal >= 1000000 ? `$${((safeGoal * 0.33) / 1000000).toFixed(1)}M` : `$${Math.round(safeGoal * 0.33).toLocaleString()}`;
+    const m2 = safeGoal >= 1000000 ? `$${((safeGoal * 0.66) / 1000000).toFixed(1)}M` : `$${Math.round(safeGoal * 0.66).toLocaleString()}`;
 
     return (
         <section ref={sectionRef} id="story" className="py-[100px] relative z-10 w-full bg-animated-depth">
@@ -125,7 +126,7 @@ export default function ProgressTracker({ raised = 0, goal = 7000000 }: Progress
             <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
                 <div className="bg-shimmer opacity-10"></div>
 
-                {/* Atmospheric Particles (Reusing logic for consistency) */}
+                {/* Atmospheric Particles */}
                 {mounted && [...Array(15)].map((_, i) => (
                     <div
                         key={i}
@@ -138,7 +139,7 @@ export default function ProgressTracker({ raised = 0, goal = 7000000 }: Progress
                             animationDuration: `${Math.random() * 12 + 12}s`,
                             animationDelay: `${Math.random() * 10}s`,
                             opacity: Math.random() * 0.2 + 0.05,
-                            background: 'rgba(239, 182, 77, 0.4)' // Subtle gold motes
+                            background: 'rgba(239, 182, 77, 0.4)'
                         }}
                     ></div>
                 ))}
@@ -148,9 +149,11 @@ export default function ProgressTracker({ raised = 0, goal = 7000000 }: Progress
 
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-4 heading-font w-full">
                     <h2 className="text-[1.8rem] sm:text-[2.5rem] md:text-[3.5rem] font-bold tracking-wide leading-none break-words">
-                        <span className="text-gold">${displayRaised.toLocaleString('en-US', { notation: 'compact', maximumFractionDigits: 1 })}</span> <span className="text-white">RAISED</span>
+                        <span className="text-gold">{formattedRaised}</span> <span className="text-white">RAISED</span>
                     </h2>
-                    <span className="text-text-muted text-sm tracking-widest mb-1 mt-2 md:mt-0 font-medium uppercase">GOAL: ${safeGoal.toLocaleString('en-US', { notation: 'compact', maximumFractionDigits: 1 })}</span>
+                    <span className="text-text-muted text-sm tracking-widest mb-1 mt-2 md:mt-0 font-medium uppercase">
+                        GOAL: {formattedGoal}
+                    </span>
                 </div>
 
                 <div className="relative w-full mb-2 h-1 mt-4">
@@ -168,9 +171,9 @@ export default function ProgressTracker({ raised = 0, goal = 7000000 }: Progress
 
                 <div className="flex justify-between text-text-muted text-[10px] md:text-xs font-semibold mt-4 px-1">
                     <span>$0</span>
-                    <span>$2.5M</span>
-                    <span>$5M</span>
-                    <span>${safeGoal.toLocaleString('en-US', { notation: 'compact', maximumFractionDigits: 1 })}</span>
+                    <span>{m1}</span>
+                    <span>{m2}</span>
+                    <span>{formattedGoal}</span>
                 </div>
 
                 {/* Animated Ark Layers */}
@@ -219,8 +222,8 @@ export default function ProgressTracker({ raised = 0, goal = 7000000 }: Progress
                             </mask>
                         </defs>
 
-                        {/* GHOST OUTLINE (Persistent Goal / Field) */}
-                        <g id="ghost" opacity="0.1" stroke="#F5EDD8" strokeWidth="0.8">
+                        {/* GHOST OUTLINE (Persistent Goal / Blueprint) */}
+                        <g id="ghost" opacity="0.12" stroke="#F5EDD8" strokeWidth="0.8">
                             {/* Hull Field */}
                             <path d="M 65 240 Q 85 305 125 318 L 595 318 Q 645 305 660 240 L 630 200 L 90 200 Z" fill="rgba(245, 237, 216, 0.04)" />
                             {/* Decorative Hull Lines */}
@@ -282,7 +285,7 @@ export default function ProgressTracker({ raised = 0, goal = 7000000 }: Progress
                             </g>
                         </g>
 
-                        {/* COLORED LAYERS (Vertical Reveal) */}
+                        {/* COLORED LAYERS (Vertical Reveal with masked building height) */}
                         <g mask="url(#revealMask)">
                             {/* S1: HULL */}
                             <g id="s1">

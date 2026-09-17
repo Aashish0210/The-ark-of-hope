@@ -9,19 +9,18 @@ import CardGallery from "@/components/CardGallery";
 import ProgressTracker from "@/components/ProgressTracker";
 import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
+import MaintenancePage from "@/components/MaintenancePage";
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = 'force-dynamic';
 export const revalidate = 0; // Disable static rendering to always show fresh data
 
 export default async function Home() {
   let rawSettings = null;
   try {
-    const results = await Promise.all([
-      prisma.siteSettings.findFirst(),
-    ]);
-    rawSettings = results[0];
+    rawSettings = await prisma.siteSettings.findFirst();
   } catch (error) {
-    console.error("Failed to fetch from database:", error);
+    console.error("Failed to fetch settings from database:", error);
   }
 
   const settings = rawSettings || {
@@ -31,7 +30,23 @@ export default async function Home() {
     heroSubtitle: "A story of faith in Nepal",
     heroText:
       "Every great journey begins with a single plank. Once gifted for the Ark, see the work, and please be ready—one donation at a time.",
+    maintenanceMode: false,
   };
+
+  // Maintenance mode handling:
+  // In production (or if FORCE_MAINTENANCE=true), show MaintenancePage if settings.maintenanceMode is true or MAINTENANCE_MODE env is true.
+  // When running locally in development without FORCE_MAINTENANCE, default to full site for testing.
+  const isMaintenanceEnv = process.env.MAINTENANCE_MODE === 'true';
+  const isForceMaintenance = process.env.FORCE_MAINTENANCE === 'true';
+  const isProduction = process.env.NODE_ENV === 'production';
+
+  const shouldShowMaintenance =
+    isForceMaintenance ||
+    (isProduction && (settings.maintenanceMode || isMaintenanceEnv));
+
+  if (shouldShowMaintenance) {
+    return <MaintenancePage />;
+  }
 
   return (
     <main>

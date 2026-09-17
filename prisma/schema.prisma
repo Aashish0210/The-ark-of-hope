@@ -9,13 +9,14 @@ datasource db {
 }
 
 model SiteSettings {
-  id           Int      @id @default(autoincrement())
-  raised       Float    @default(0)
-  goal         Float    @default(100000000)
-  heroTitle    String   @default("Ark of Hope Project")
-  heroSubtitle String   @default("A story of faith in Nepal")
-  heroText     String   @default("Every great journey begins with a single plank. Once gifted for the Ark, see the work, and please be ready—one donation at a time.")
-  updatedAt    DateTime @updatedAt
+  id              Int      @id @default(autoincrement())
+  raised          Float    @default(0)
+  goal            Float    @default(7000000)
+  heroTitle       String   @default("Ark of Hope Project")
+  heroSubtitle    String   @default("A story of faith in Nepal")
+  heroText        String   @default("Every great journey begins with a single plank. Once gifted for the Ark, see the work, and please be ready—one donation at a time.")
+  maintenanceMode Boolean  @default(false)
+  updatedAt       DateTime @updatedAt
 }
 
 model DonationTier {
