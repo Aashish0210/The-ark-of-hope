@@ -34,15 +34,11 @@ export default async function Home() {
   };
 
   // Maintenance mode handling:
-  // In production (or if FORCE_MAINTENANCE=true), show MaintenancePage if settings.maintenanceMode is true or MAINTENANCE_MODE env is true.
-  // When running locally in development without FORCE_MAINTENANCE, default to full site for testing.
-  const isMaintenanceEnv = process.env.MAINTENANCE_MODE === 'true';
+  // Directly controlled by Admin dashboard setting (settings.maintenanceMode), or by FORCE_MAINTENANCE env flag.
   const isForceMaintenance = process.env.FORCE_MAINTENANCE === 'true';
-  const isProduction = process.env.NODE_ENV === 'production';
+  const isMaintenanceModeActive = Boolean(settings?.maintenanceMode);
 
-  const shouldShowMaintenance =
-    isForceMaintenance ||
-    (isProduction && (settings.maintenanceMode || isMaintenanceEnv));
+  const shouldShowMaintenance = isForceMaintenance || isMaintenanceModeActive;
 
   if (shouldShowMaintenance) {
     return <MaintenancePage />;
