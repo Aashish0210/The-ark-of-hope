@@ -13,12 +13,10 @@ const ArrowUp = () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none
 
 const LayoutIcon = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="7" height="9" x="3" y="3" rx="1" /><rect width="7" height="5" x="14" y="3" rx="1" /><rect width="7" height="9" x="14" y="12" rx="1" /><rect width="7" height="5" x="3" y="16" rx="1" /></svg>;
 const SettingsIcon = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" /><circle cx="12" cy="12" r="3" /></svg>;
-const TiersIcon = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3" /><path d="M3 5V19A9 3 0 0 0 21 19V5" /><path d="M3 12A9 3 0 0 0 21 12" /></svg>;
-const ChartIcon = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" x2="18" y1="20" y2="10" /><line x1="12" x2="12" y1="20" y2="4" /><line x1="6" x2="6" y1="20" y2="14" /></svg>;
 const LogOutIcon = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" /></svg>;
 const UserIcon = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>;
 const BoatIcon = () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 13h20" /><path d="M22 13a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4" /><path d="M12 2v11" /><path d="M12 2 3 13" /></svg>;
-const TrashIcon = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18m-2 0v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6m3 0V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" /></svg>;
+
 
 export default function AdminPage() {
     const { data: session, status } = useSession();
@@ -29,10 +27,7 @@ export default function AdminPage() {
         goal: 7000000,
         maintenanceMode: false
     });
-    const [tiers, setTiers] = useState<any[]>([]);
-    const [stats, setStats] = useState<any[]>([]);
     const [trends, setTrends] = useState<any[]>([]);
-    const [donations, setDonations] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [profile, setProfile] = useState<any>({ email: '', image: '', password: '' });
     const [activeSection, setActiveSection] = useState('overview');
@@ -57,16 +52,12 @@ export default function AdminPage() {
 
         async function fetchData() {
             try {
-                const [resSettings, resTiers, resStats, resTrends] = await Promise.all([
+                const [resSettings, resTrends] = await Promise.all([
                     fetch('/api/settings', { cache: 'no-store' }),
-                    fetch('/api/tiers', { cache: 'no-store' }),
-                    fetch('/api/stats', { cache: 'no-store' }),
                     fetch('/api/trend', { cache: 'no-store' })
                 ]);
 
                 if (resSettings.ok) setSettings(await resSettings.json());
-                if (resTiers.ok) setTiers(await resTiers.json());
-                if (resStats.ok) setStats(await resStats.json());
                 if (resTrends.ok) setTrends(await resTrends.json());
 
                 const resProfile = await fetch('/api/admin/profile', { cache: 'no-store' });
@@ -102,7 +93,7 @@ export default function AdminPage() {
         };
 
         const observer = new IntersectionObserver(observerCallback, observerOptions);
-        const sections = ['overview', 'settings', 'stats', 'tiers', 'account'];
+        const sections = ['overview', 'settings', 'account'];
 
         sections.forEach((id) => {
             const element = document.getElementById(id);
@@ -212,93 +203,7 @@ export default function AdminPage() {
         }
     };
 
-    const saveTier = async (tier: any) => {
-        try {
-            const res = await fetch('/api/tiers', {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(tier)
-            });
-            if (res.ok) {
-                showToast(`Tier "${tier.name}" saved!`);
-            } else {
-                const errorData = await res.json().catch(() => ({}));
-                showToast(errorData.details || errorData.error || `Failed to save tier ${tier.name}`, 'error');
-            }
-        } catch (error) {
-            showToast(`Error saving tier`, 'error');
-        }
-    };
 
-    const saveStat = async (stat: any) => {
-        try {
-            const res = await fetch('/api/stats', {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(stat)
-            });
-            if (res.ok) {
-                showToast(`Stat updated!`);
-            } else {
-                const errorData = await res.json().catch(() => ({}));
-                showToast(errorData.details || errorData.error || `Failed to update stat`, 'error');
-            }
-        } catch (error) {
-            showToast('Error updating stat', 'error');
-        }
-    };
-
-    const addNewStat = async () => {
-        try {
-            const res = await fetch('/api/stats', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' }
-            });
-            if (res.ok) {
-                const newStat = await res.json();
-                setStats([...stats, newStat]);
-                showToast('New stat added!');
-            } else {
-                showToast('Failed to add new stat', 'error');
-            }
-        } catch (error) {
-            showToast('Error adding stat', 'error');
-        }
-    };
-
-    const deleteStat = async (id: number) => {
-        if (!window.confirm('Are you sure you want to delete this statistic?')) {
-            return;
-        }
-
-        try {
-            const res = await fetch(`/api/stats?id=${id}`, {
-                method: 'DELETE'
-            });
-
-            if (res.ok) {
-                setStats((prev: any[]) => prev.filter(s => s.id !== id));
-                showToast('Stat deleted');
-            } else {
-                showToast('Failed to delete stat', 'error');
-            }
-        } catch (error) {
-            showToast('Error deleting stat', 'error');
-        }
-    };
-
-    const saveAllStats = async () => {
-        try {
-            await Promise.all(stats.map(stat => fetch('/api/stats', {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(stat)
-            })));
-            showToast('All impact statistics saved!');
-        } catch (error) {
-            showToast('Error saving all statistics.', 'error');
-        }
-    };
 
     if (status === 'loading' || loading) {
         return (
@@ -366,23 +271,7 @@ export default function AdminPage() {
                         <span>Site Settings</span>
                     </a>
 
-                    <a
-                        href="#stats"
-                        className={`group relative flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${activeSection === 'stats' ? 'bg-white/5 text-gold font-bold shadow-lg shadow-black/20' : 'text-slate-400 hover:text-white hover:bg-white/5'}`}
-                    >
-                        {activeSection === 'stats' && <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-gold rounded-r-full shadow-[0_0_15px_rgba(234,179,8,0.5)]" />}
-                        <ChartIcon />
-                        <span>Impact Stats</span>
-                    </a>
 
-                    <a
-                        href="#tiers"
-                        className={`group relative flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${activeSection === 'tiers' ? 'bg-white/5 text-gold font-bold shadow-lg shadow-black/20' : 'text-slate-400 hover:text-white hover:bg-white/5'}`}
-                    >
-                        {activeSection === 'tiers' && <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-gold rounded-r-full shadow-[0_0_15px_rgba(234,179,8,0.5)]" />}
-                        <TiersIcon />
-                        <span>Donation Tiers</span>
-                    </a>
 
                     <a
                         href="#account"
@@ -456,7 +345,7 @@ export default function AdminPage() {
                 <div className="p-6 md:p-10 max-w-[1400px] w-full mx-auto space-y-12">
                     {/* SECTION 1: OVERVIEW & ANALYTICS */}
                     <section id="overview" className="scroll-mt-20">
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                             <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
                                 <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">Total Raised</span>
                                 <h3 className="text-3xl font-bold text-slate-800 tracking-tight text-gold">
@@ -475,16 +364,6 @@ export default function AdminPage() {
                                 </h3>
                                 <div className="text-xs text-slate-500 mt-2">
                                     Target amount to complete Ark
-                                </div>
-                            </div>
-
-                            <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-                                <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">Donation Tiers</span>
-                                <h3 className="text-3xl font-bold text-slate-800 tracking-tight">
-                                    {tiers.length}
-                                </h3>
-                                <div className="text-xs text-slate-500 mt-2">
-                                    Active contribution tiers
                                 </div>
                             </div>
 
@@ -678,165 +557,7 @@ export default function AdminPage() {
                         </div>
                     </section>
 
-                    <hr className="border-slate-200" />
 
-                    {/* SECTION 3: IMPACT STATS */}
-                    <section id="stats" className="scroll-mt-20">
-                        <div className="bg-white p-6 md:p-8 rounded-2xl border border-slate-200 shadow-sm">
-                            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
-                                <div>
-                                    <h2 className="text-xl font-bold text-slate-800">Impact Statistics</h2>
-                                    <p className="text-xs text-slate-500">Manage the impact pillars shown across the story sections.</p>
-                                </div>
-                                <div className="flex gap-3">
-                                    <button
-                                        onClick={addNewStat}
-                                        className="bg-gold hover:bg-amber-500 text-[#08111b] font-bold py-2 px-4 rounded-xl text-xs transition-all shadow-sm"
-                                    >
-                                        + Add Statistic
-                                    </button>
-                                    <button
-                                        onClick={saveAllStats}
-                                        className="bg-[#08111b] hover:bg-slate-800 text-white font-bold py-2 px-5 rounded-xl text-xs transition-all shadow-sm"
-                                    >
-                                        Save All Stats
-                                    </button>
-                                </div>
-                            </div>
-
-                            <div className="space-y-4">
-                                {stats.map((stat, i) => (
-                                    <div key={stat.id || i} className="flex flex-col sm:flex-row gap-3 items-end bg-slate-50 p-4 rounded-xl border border-slate-200">
-                                        <div className="flex-1 w-full">
-                                            <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">Impact Description</label>
-                                            <input
-                                                type="text"
-                                                value={stat.value || ''}
-                                                onChange={(e) => {
-                                                    const newStats = [...stats];
-                                                    newStats[i].value = e.target.value;
-                                                    setStats(newStats);
-                                                }}
-                                                className="w-full bg-white border border-slate-200 rounded-lg p-2.5 text-sm text-slate-800 focus:outline-none focus:border-gold"
-                                            />
-                                        </div>
-                                        <div className="flex gap-2 w-full sm:w-auto">
-                                            <button
-                                                onClick={() => saveStat(stat)}
-                                                className="flex-1 sm:flex-initial bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold py-2 px-4 rounded-lg text-xs transition-colors"
-                                            >
-                                                Save
-                                            </button>
-                                            <button
-                                                onClick={() => deleteStat(stat.id)}
-                                                className="bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 p-2.5 rounded-lg transition-colors"
-                                                title="Delete Stat"
-                                            >
-                                                <TrashIcon />
-                                            </button>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    </section>
-
-                    <hr className="border-slate-200" />
-
-                    {/* SECTION 4: DONATION TIERS */}
-                    <section id="tiers" className="scroll-mt-20">
-                        <div className="bg-white p-6 md:p-8 rounded-2xl border border-slate-200 shadow-sm">
-                            <div className="mb-6">
-                                <h2 className="text-xl font-bold text-slate-800">Donation Tiers</h2>
-                                <p className="text-xs text-slate-500">Configure tier names, pricing, availability, and popular highlights.</p>
-                            </div>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                {tiers.map((tier, i) => (
-                                    <div key={tier.id || i} className="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-4">
-                                        <div className="flex items-center gap-3">
-                                            <span className="text-2xl">{tier.icon}</span>
-                                            <div className="flex-1">
-                                                <input
-                                                    type="text"
-                                                    value={tier.name || ''}
-                                                    onChange={(e) => {
-                                                        const newTiers = [...tiers];
-                                                        newTiers[i].name = e.target.value;
-                                                        setTiers(newTiers);
-                                                    }}
-                                                    className="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 font-bold text-slate-800 text-base focus:outline-none focus:border-gold"
-                                                />
-                                            </div>
-                                            <label className="flex items-center gap-1.5 text-xs text-slate-600 cursor-pointer">
-                                                <input
-                                                    type="checkbox"
-                                                    checked={Boolean(tier.isPopular)}
-                                                    onChange={(e) => {
-                                                        const newTiers = [...tiers];
-                                                        newTiers[i].isPopular = e.target.checked;
-                                                        setTiers(newTiers);
-                                                    }}
-                                                    className="rounded text-gold focus:ring-gold"
-                                                />
-                                                <span>Popular</span>
-                                            </label>
-                                        </div>
-
-                                        <div className="grid grid-cols-2 gap-4">
-                                            <div>
-                                                <label className="block text-[11px] font-bold text-slate-500 uppercase mb-1">Price ($)</label>
-                                                <input
-                                                    type="number"
-                                                    value={tier.price ?? 0}
-                                                    onChange={(e) => {
-                                                        const newTiers = [...tiers];
-                                                        newTiers[i].price = e.target.value;
-                                                        setTiers(newTiers);
-                                                    }}
-                                                    className="w-full bg-white border border-slate-200 rounded-lg p-2 text-sm text-slate-800 focus:outline-none focus:border-gold font-semibold"
-                                                />
-                                            </div>
-                                            <div>
-                                                <label className="block text-[11px] font-bold text-slate-500 uppercase mb-1">Available Units</label>
-                                                <input
-                                                    type="number"
-                                                    value={tier.available ?? 0}
-                                                    onChange={(e) => {
-                                                        const newTiers = [...tiers];
-                                                        newTiers[i].available = e.target.value;
-                                                        setTiers(newTiers);
-                                                    }}
-                                                    className="w-full bg-white border border-slate-200 rounded-lg p-2 text-sm text-slate-800 focus:outline-none focus:border-gold font-semibold"
-                                                />
-                                            </div>
-                                        </div>
-
-                                        <div>
-                                            <label className="block text-[11px] font-bold text-slate-500 uppercase mb-1">Description</label>
-                                            <textarea
-                                                value={tier.description || ''}
-                                                onChange={(e) => {
-                                                    const newTiers = [...tiers];
-                                                    newTiers[i].description = e.target.value;
-                                                    setTiers(newTiers);
-                                                }}
-                                                rows={2}
-                                                className="w-full bg-white border border-slate-200 rounded-lg p-2 text-xs text-slate-700 focus:outline-none focus:border-gold italic"
-                                            />
-                                        </div>
-
-                                        <button
-                                            onClick={() => saveTier(tier)}
-                                            className="w-full bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold py-2.5 rounded-xl text-xs transition-colors"
-                                        >
-                                            Save Tier
-                                        </button>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    </section>
 
                     <hr className="border-slate-200" />
 
