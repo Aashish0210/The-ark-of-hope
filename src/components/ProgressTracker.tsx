@@ -16,6 +16,8 @@ export default function ProgressTracker({ raised = 0, goal = 7000000 }: Progress
     const [inView, setInView] = useState(false);
     const [mounted, setMounted] = useState(false);
     const sectionRef = useRef<HTMLElement>(null);
+    const inViewRef = useRef(inView);
+    inViewRef.current = inView;
 
     useEffect(() => {
         setMounted(true);
@@ -40,7 +42,9 @@ export default function ProgressTracker({ raised = 0, goal = 7000000 }: Progress
                     if (data?.raised !== undefined) {
                         const newAmount = Number(data.raised);
                         setCurrentRaised(newAmount);
-                        setDisplayRaised((prev) => (prev === 0 ? newAmount : prev));
+                        if (!inViewRef.current) {
+                            setDisplayRaised(newAmount);
+                        }
                     }
                 }
             } catch (_) {}
