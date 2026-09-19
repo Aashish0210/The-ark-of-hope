@@ -9,9 +9,21 @@ export const revalidate = 0;
 
 export async function GET() {
     try {
-        const stats = await prisma.stat.findMany({
+        let stats = await prisma.stat.findMany({
             orderBy: { order: 'asc' }
         });
+        if (stats.length === 0) {
+            const defaultStats = [
+                { value: "Faith-Based & Historical Learning", label: "", order: 1 },
+                { value: "Biblical Hospitality & Destination", label: "", order: 2 },
+                { value: "Local Economic Growth", label: "", order: 3 },
+                { value: "Sustainable Job Creation", label: "", order: 4 },
+            ];
+            try {
+                await prisma.stat.createMany({ data: defaultStats });
+                stats = await prisma.stat.findMany({ orderBy: { order: 'asc' } });
+            } catch (_) {}
+        }
         return NextResponse.json(stats, {
             headers: {
                 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate'

@@ -1,14 +1,23 @@
 const { execSync } = require('child_process');
 
-// Align database URLs so Prisma always finds POSTGRES_URL
-const dbUrl = process.env.POSTGRES_URL || 
-              process.env.DATABASE_URL || 
-              process.env.POSTGRES_PRISMA_URL || 
-              process.env.POSTGRES_URL_NON_POOLING;
+// Align database URLs so Prisma always finds POSTGRES_URL and DATABASE_URL
+const dbDirectUrl = process.env.POSTGRES_URL_NON_POOLING ||
+                    process.env.DATABASE_POSTGRES_URL_NON_POOLING ||
+                    process.env.DATABASE_URL_UNPOOLED ||
+                    process.env.POSTGRES_URL ||
+                    process.env.DATABASE_POSTGRES_URL ||
+                    process.env.DATABASE_URL;
+
+const dbUrl = process.env.POSTGRES_PRISMA_URL || 
+              process.env.DATABASE_POSTGRES_PRISMA_URL ||
+              process.env.POSTGRES_URL || 
+              process.env.DATABASE_POSTGRES_URL ||
+              process.env.DATABASE_URL ||
+              dbDirectUrl;
 
 if (dbUrl) {
-  process.env.POSTGRES_URL = dbUrl;
-  process.env.DATABASE_URL = dbUrl;
+  process.env.POSTGRES_URL = dbDirectUrl || dbUrl;
+  process.env.DATABASE_URL = dbDirectUrl || dbUrl;
 }
 
 try {

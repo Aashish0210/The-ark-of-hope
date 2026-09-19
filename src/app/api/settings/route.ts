@@ -16,7 +16,7 @@ export async function GET() {
             settings = await prisma.siteSettings.create({
                 data: {
                     id: 1,
-                    raised: 0,
+                    raised: 9000000,
                     goal: 7000000,
                     heroTitle: "Ark of Hope Project",
                     heroSubtitle: "A story of faith in Nepal",
