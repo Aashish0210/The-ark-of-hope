@@ -19,7 +19,9 @@ export const fetchCache = 'force-no-store';
 export default async function Home() {
   let rawSettings = null;
   try {
-    rawSettings = await prisma.siteSettings.findFirst();
+    rawSettings = await prisma.siteSettings.findFirst({
+      orderBy: { id: 'asc' }
+    });
   } catch (error) {
     console.error("Failed to fetch settings from database:", error);
   }
@@ -56,7 +58,7 @@ export default async function Home() {
       <TheStoryPart1 />
       <CardGallery />
       <TheStoryPart2 />
-      <ProgressTracker raised={settings.raised} goal={settings.goal} />
+      <ProgressTracker raised={Number(settings.raised)} goal={Number(settings.goal)} />
       <TheStoryPart3 />
       <Contact />
       <Footer />

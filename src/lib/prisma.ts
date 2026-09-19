@@ -17,21 +17,32 @@ if (hasDatabaseUrl && databaseUrl) {
   process.env.DATABASE_URL = databaseUrl;
 }
 
-// SQLite Local Persistent Fallback
+// SQLite / Turso Persistent Fallback
 function createSqlitePrisma() {
-  // On Vercel / serverless lambdas, process.cwd() is read-only. Fall back to /tmp/dev.db if needed.
-  let dbPath = path.join(process.cwd(), 'dev.db');
-  if (process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME) {
-    dbPath = path.join('/tmp', 'dev.db');
-    const localSeedDb = path.join(process.cwd(), 'dev.db');
-    if (fs.existsSync(localSeedDb) && !fs.existsSync(dbPath)) {
-      try {
-        fs.copyFileSync(localSeedDb, dbPath);
-      } catch (_) {}
-    }
-  }
+  const tursoUrl = process.env.TURSO_DATABASE_URL || process.env.LIBSQL_URL;
+  const tursoAuthToken = process.env.TURSO_AUTH_TOKEN || process.env.LIBSQL_AUTH_TOKEN;
 
-  const client = createClient({ url: `file:${dbPath}` });
+  let client: any;
+  if (tursoUrl) {
+    client = createClient({
+      url: tursoUrl,
+      authToken: tursoAuthToken
+    });
+  } else {
+    // On Vercel / serverless lambdas, process.cwd() is read-only. Fall back to /tmp/dev.db if needed.
+    let dbPath = path.join(process.cwd(), 'dev.db');
+    if (process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME) {
+      dbPath = path.join('/tmp', 'dev.db');
+      const localSeedDb = path.join(process.cwd(), 'dev.db');
+      if (fs.existsSync(localSeedDb) && !fs.existsSync(dbPath)) {
+        try {
+          fs.copyFileSync(localSeedDb, dbPath);
+        } catch (_) {}
+      }
+    }
+
+    client = createClient({ url: `file:${dbPath}` });
+  }
 
   let isInitialized = false;
 

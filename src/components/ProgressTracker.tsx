@@ -12,7 +12,7 @@ export default function ProgressTracker({ raised = 0, goal = 7000000 }: Progress
     const safeGoal = Number.isFinite(Number(goal)) && Number(goal) > 0 ? Number(goal) : 7000000;
 
     const [currentRaised, setCurrentRaised] = useState(safeRaised);
-    const [displayRaised, setDisplayRaised] = useState(0);
+    const [displayRaised, setDisplayRaised] = useState(safeRaised);
     const [inView, setInView] = useState(false);
     const [mounted, setMounted] = useState(false);
     const sectionRef = useRef<HTMLElement>(null);
@@ -21,9 +21,10 @@ export default function ProgressTracker({ raised = 0, goal = 7000000 }: Progress
         setMounted(true);
     }, []);
 
-    // Sync with prop changes
+    // Sync with prop changes immediately
     useEffect(() => {
         setCurrentRaised(safeRaised);
+        setDisplayRaised(safeRaised);
     }, [safeRaised]);
 
     // Continuous live sync & WebSocket logic
@@ -37,11 +38,16 @@ export default function ProgressTracker({ raised = 0, goal = 7000000 }: Progress
                 if (res.ok) {
                     const data = await res.json();
                     if (data?.raised !== undefined) {
-                        setCurrentRaised(Number(data.raised));
+                        const newAmount = Number(data.raised);
+                        setCurrentRaised(newAmount);
+                        setDisplayRaised((prev) => (prev === 0 ? newAmount : prev));
                     }
                 }
             } catch (_) {}
         };
+
+        // Fetch immediately on mount to ensure freshness
+        fetchLatest();
 
         const initPusher = async () => {
             try {
@@ -100,15 +106,23 @@ export default function ProgressTracker({ raised = 0, goal = 7000000 }: Progress
         return () => observer.disconnect();
     }, []);
 
+    const displayRaisedRef = useRef(displayRaised);
+    displayRaisedRef.current = displayRaised;
+
     useEffect(() => {
-        if (!inView) return;
+        if (!inView) {
+            setDisplayRaised(currentRaised);
+            return;
+        }
 
         let animationFrameId: number;
         let startTime: number | null = null;
-        const duration = 1800; // 1.8s smooth count-up
+        const duration = 1500; // 1.5s smooth count-up
 
-        const startVal = displayRaised;
+        const startVal = displayRaisedRef.current;
         const targetVal = currentRaised;
+
+        if (startVal === targetVal) return;
 
         const animate = (timestamp: number) => {
             if (!startTime) startTime = timestamp;
@@ -131,8 +145,8 @@ export default function ProgressTracker({ raised = 0, goal = 7000000 }: Progress
         return () => window.cancelAnimationFrame(animationFrameId);
     }, [inView, currentRaised]);
 
-    // Percentage of progress
-    const percentage = inView ? Math.min(Math.max((currentRaised / safeGoal) * 100, 0), 100) : 0;
+    // Percentage of progress matches actual displayRaised
+    const percentage = safeGoal > 0 ? Math.min(Math.max((displayRaised / safeGoal) * 100, 0), 100) : 0;
 
     const formattedRaised = displayRaised >= 1000000
         ? `$${(displayRaised / 1000000).toFixed(displayRaised % 1000000 === 0 ? 0 : 2)}M`
