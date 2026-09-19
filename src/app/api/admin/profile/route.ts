@@ -14,8 +14,9 @@ export async function GET() {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
-        const user = await prisma.user.findUnique({
-            where: { id: parseInt((session.user as any).id) },
+        const sessionEmail = session.user.email.trim().toLowerCase();
+        let user = await prisma.user.findUnique({
+            where: { email: sessionEmail },
             select: {
                 id: true,
                 email: true,
@@ -23,9 +24,23 @@ export async function GET() {
             }
         });
 
-        return NextResponse.json(user);
+        if (!user && (session.user as any).id) {
+            const parsedId = parseInt((session.user as any).id);
+            if (!isNaN(parsedId)) {
+                user = await prisma.user.findUnique({
+                    where: { id: parsedId },
+                    select: {
+                        id: true,
+                        email: true,
+                        image: true
+                    }
+                });
+            }
+        }
+
+        return NextResponse.json(user || { email: sessionEmail, image: null });
     } catch (error) {
-        console.error(error);
+        console.error('Profile fetch error:', error);
         return NextResponse.json({ error: 'Failed to fetch profile' }, { status: 500 });
     }
 }
@@ -40,27 +55,63 @@ export async function PUT(req: Request) {
         const body = await req.json();
         const { email, password, image } = body;
 
-        const userId = (session.user as any).id;
-        if (!userId) {
-            return NextResponse.json({ error: "Missing user ID in session" }, { status: 400 });
+        const sessionEmail = session.user.email.trim().toLowerCase();
+
+        // 1. Locate user by email first, fallback to id
+        let user = await prisma.user.findUnique({
+            where: { email: sessionEmail }
+        });
+
+        if (!user && (session.user as any).id) {
+            const parsedId = parseInt((session.user as any).id);
+            if (!isNaN(parsedId)) {
+                user = await prisma.user.findUnique({
+                    where: { id: parsedId }
+                });
+            }
         }
 
         const data: any = {};
-        if (email) data.email = email;
-        if (image !== undefined) data.image = image;
-        if (password) {
-            data.password = await bcrypt.hash(password, 10);
+        if (email && email.trim().length > 0) {
+            data.email = email.trim().toLowerCase();
+        }
+        if (image !== undefined) {
+            data.image = image;
+        }
+        if (password && typeof password === 'string' && password.trim().length > 0) {
+            data.password = await bcrypt.hash(password.trim(), 10);
         }
 
-        const updatedUser = await prisma.user.update({
-            where: { id: parseInt(userId) },
-            data,
-            select: {
-                id: true,
-                email: true,
-                image: true
-            }
-        });
+        let updatedUser;
+        if (user) {
+            updatedUser = await prisma.user.update({
+                where: { id: user.id },
+                data,
+                select: {
+                    id: true,
+                    email: true,
+                    image: true
+                }
+            });
+        } else {
+            // Auto-provision if record didn't exist in database
+            const initialPassword = password && password.trim().length > 0
+                ? await bcrypt.hash(password.trim(), 10)
+                : await bcrypt.hash('arkproject@2026', 10);
+
+            updatedUser = await prisma.user.create({
+                data: {
+                    email: data.email || sessionEmail,
+                    password: initialPassword,
+                    image: data.image || null
+                },
+                select: {
+                    id: true,
+                    email: true,
+                    image: true
+                }
+            });
+        }
 
         return NextResponse.json(updatedUser);
     } catch (error: any) {
