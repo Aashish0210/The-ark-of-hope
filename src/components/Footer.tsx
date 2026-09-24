@@ -73,7 +73,7 @@ export default function Footer() {
             <div className="mt-6 flex flex-wrap items-center justify-center gap-2 text-[11px] sm:text-xs text-text-muted">
               <span className="inline-flex items-center gap-1.5 bg-black/40 px-3 py-1 rounded-full border border-gold/15">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-                Nepal SBI Bank (SWIFT: <strong className="text-gold font-mono">NSBINPKA</strong>)
+                Sanima Bank (SWIFT: <strong className="text-gold font-mono">SNMANPKA</strong>)
               </span>
               <span className="inline-flex items-center gap-1.5 bg-black/40 px-3 py-1 rounded-full border border-gold/15">
                 Wise &amp; Remitly Supported
