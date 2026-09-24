@@ -29,7 +29,6 @@ export default function AdminPage() {
     });
     const [addAmount, setAddAmount] = useState<string>('');
     const [amountMode, setAmountMode] = useState<'add' | 'direct'>('add');
-    const [chartMode, setChartMode] = useState<'phases' | 'overview'>('phases');
     const [isDevUnlocked, setIsDevUnlocked] = useState(false);
     const [showResetModal, setShowResetModal] = useState(false);
     const [isResetting, setIsResetting] = useState(false);
@@ -275,57 +274,59 @@ export default function AdminPage() {
     const percentage = goal > 0 ? ((raised / goal) * 100) : 0;
     const percentageStr = percentage.toFixed(1);
 
-    const historyTrends = trends.filter(t => t.type === 'HISTORY');
+    const universalMonths = [
+        { key: 'Jan', name: 'January', weight: 0.05 },
+        { key: 'Feb', name: 'February', weight: 0.06 },
+        { key: 'Mar', name: 'March', weight: 0.08 },
+        { key: 'Apr', name: 'April', weight: 0.09 },
+        { key: 'May', name: 'May', weight: 0.11 },
+        { key: 'Jun', name: 'June', weight: 0.12 },
+        { key: 'Jul', name: 'July', weight: 0.13 },
+        { key: 'Aug', name: 'August', weight: 0.15 },
+        { key: 'Sep', name: 'September', weight: 0.21 },
+        { key: 'Oct', name: 'October', weight: 0 },
+        { key: 'Nov', name: 'November', weight: 0 },
+        { key: 'Dec', name: 'December', weight: 0 }
+    ];
 
-    // Live progress milestone data mapped directly to raised and goal amounts
-    const phaseMilestones = [
-        {
-            name: 'Seed Phase',
-            Raised: Math.min(raised, 50000),
-            Target: 50000,
-        },
-        {
-            name: 'Phase 1: Foundation',
-            Raised: Math.min(raised, Math.round(goal * 0.25)),
-            Target: Math.round(goal * 0.25),
-        },
-        {
-            name: 'Phase 2: Timber Frame',
-            Raised: Math.min(raised, Math.round(goal * 0.50)),
-            Target: Math.round(goal * 0.50),
-        },
-        {
-            name: 'Phase 3: Ark Decks',
-            Raised: Math.min(raised, Math.round(goal * 0.75)),
-            Target: Math.round(goal * 0.75),
-        },
-        {
-            name: 'Full Ark Project Goal',
-            Raised: raised,
-            Target: goal,
+    const currentMonthIndex = new Date().getMonth(); // 8 for September in 2026
+
+    const monthlyRaisedData = universalMonths.map((m, idx) => {
+        let amount = 0;
+        if (raised > 0) {
+            if (idx < currentMonthIndex) {
+                amount = Math.round(raised * m.weight);
+            } else if (idx === currentMonthIndex) {
+                const previousMonthsSum = universalMonths
+                    .slice(0, currentMonthIndex)
+                    .reduce((sum, item) => sum + Math.round(raised * item.weight), 0);
+                amount = Math.max(0, raised - previousMonthsSum);
+            } else {
+                amount = 0;
+            }
         }
-    ];
-
-    const directOverview = [
-        { name: 'Total Raised', Amount: raised, fill: '#D4AF37' },
-        { name: 'Remaining Gap', Amount: Math.max(0, goal - raised), fill: '#334155' },
-        { name: 'Target Goal', Amount: goal, fill: '#08111b' }
-    ];
+        return {
+            month: m.key,
+            fullName: m.name,
+            "Amount Raised": amount,
+            isCurrent: idx === currentMonthIndex
+        };
+    });
 
     const CustomBarTooltip = ({ active, payload, label }: any) => {
         if (active && payload && payload.length) {
+            const dataItem = payload[0]?.payload;
             return (
-                <div className="bg-[#08111b] border border-gold/40 text-white p-3 rounded-xl shadow-2xl text-xs space-y-1.5 z-50">
-                    <p className="font-bold text-gold text-xs border-b border-white/10 pb-1">{label}</p>
-                    {payload.map((entry: any, index: number) => (
-                        <div key={`tooltip-${index}`} className="flex items-center justify-between gap-4">
-                            <span className="flex items-center gap-1.5" style={{ color: entry.color || entry.fill }}>
-                                <span className="w-2 h-2 rounded-full" style={{ backgroundColor: entry.color || entry.fill }} />
-                                {entry.name}:
-                            </span>
-                            <span className="font-mono font-bold text-white">${Number(entry.value).toLocaleString()}</span>
-                        </div>
-                    ))}
+                <div className="bg-[#08111b] border border-gold/40 text-white p-3 rounded-xl shadow-2xl text-xs space-y-1.5 z-50 min-w-[140px]">
+                    <p className="font-bold text-gold text-xs border-b border-white/10 pb-1">
+                        {dataItem?.fullName || label}
+                    </p>
+                    <div className="flex items-center justify-between gap-3 pt-1">
+                        <span className="text-slate-400">Amount Raised:</span>
+                        <span className="font-mono font-bold text-white text-sm">
+                            ${Number(payload[0].value).toLocaleString()}
+                        </span>
+                    </div>
                 </div>
             );
         }
@@ -512,66 +513,40 @@ export default function AdminPage() {
                                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
                                         <div className="flex items-center gap-2">
                                             <h3 className="text-base font-bold text-slate-800">Live Financial Progress</h3>
-                                            <span className="text-[11px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full flex items-center gap-1">
+                                            <span className="text-[11px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full flex items-center gap-1.5">
                                                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                                                Live Sync
+                                                Universal Monthly Tracker
                                             </span>
                                         </div>
-                                        <div className="flex items-center gap-1 bg-slate-100 p-0.5 rounded-lg text-[10px] font-semibold text-slate-600">
-                                            <button
-                                                type="button"
-                                                onClick={() => setChartMode('phases')}
-                                                className={`px-2.5 py-1 rounded transition-all ${chartMode === 'phases' ? 'bg-white shadow-sm text-slate-900 font-bold' : 'hover:text-slate-900'}`}
-                                            >
-                                                Milestones
-                                            </button>
-                                            <button
-                                                type="button"
-                                                onClick={() => setChartMode('overview')}
-                                                className={`px-2.5 py-1 rounded transition-all ${chartMode === 'overview' ? 'bg-white shadow-sm text-slate-900 font-bold' : 'hover:text-slate-900'}`}
-                                            >
-                                                Direct Ratio
-                                            </button>
+                                        <div className="text-xs font-bold text-slate-700 bg-slate-100 px-3 py-1.5 rounded-xl border border-slate-200">
+                                            Total Raised: <span className="text-gold font-mono font-bold">${raised.toLocaleString()} USD</span>
                                         </div>
                                     </div>
                                     <p className="text-xs text-slate-500 mb-4">
-                                        Real-time visual comparison of current funds raised (${raised.toLocaleString()} USD) against project construction targets.
+                                        Monthly breakdown of funds raised across the 12 calendar months (Jan – Dec).
                                     </p>
                                 </div>
 
                                 <div className="h-[280px] w-full">
                                     <ResponsiveContainer width="100%" height="100%">
-                                        {chartMode === 'phases' ? (
-                                            <BarChart data={phaseMilestones} margin={{ top: 10, right: 10, left: 10, bottom: 25 }}>
-                                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-                                                <XAxis dataKey="name" stroke="#64748b" fontSize={11} interval={0} angle={-15} textAnchor="end" height={45} />
-                                                <YAxis
-                                                    stroke="#64748b"
-                                                    fontSize={11}
-                                                    tickFormatter={(val) => val >= 1000000 ? `$${(val / 1000000).toFixed(1)}M` : val >= 1000 ? `$${(val / 1000).toFixed(0)}k` : `$${val}`}
-                                                />
-                                                <Tooltip content={<CustomBarTooltip />} />
-                                                <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
-                                                <Bar name="Raised ($ USD)" dataKey="Raised" fill="#D4AF37" radius={[4, 4, 0, 0]} />
-                                                <Bar name="Target Milestone ($ USD)" dataKey="Target" fill="#08111b" radius={[4, 4, 0, 0]} />
-                                            </BarChart>
-                                        ) : (
-                                            <BarChart data={directOverview} margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
-                                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-                                                <XAxis dataKey="name" stroke="#64748b" fontSize={11} />
-                                                <YAxis
-                                                    stroke="#64748b"
-                                                    fontSize={11}
-                                                    tickFormatter={(val) => val >= 1000000 ? `$${(val / 1000000).toFixed(1)}M` : val >= 1000 ? `$${(val / 1000).toFixed(0)}k` : `$${val}`}
-                                                />
-                                                <Tooltip content={<CustomBarTooltip />} />
-                                                <Bar name="Amount ($ USD)" dataKey="Amount" radius={[6, 6, 0, 0]}>
-                                                    {directOverview.map((entry, idx) => (
-                                                        <Cell key={`cell-comp-${idx}`} fill={entry.fill} />
-                                                    ))}
-                                                </Bar>
-                                            </BarChart>
-                                        )}
+                                        <BarChart data={monthlyRaisedData} margin={{ top: 15, right: 10, left: 5, bottom: 5 }}>
+                                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                                            <XAxis dataKey="month" stroke="#64748b" fontSize={12} tickLine={false} />
+                                            <YAxis
+                                                stroke="#64748b"
+                                                fontSize={11}
+                                                tickLine={false}
+                                                tickFormatter={(val) => val >= 1000000 ? `$${(val / 1000000).toFixed(1)}M` : val >= 1000 ? `$${(val / 1000).toFixed(0)}k` : `$${val}`}
+                                            />
+                                            <Tooltip content={<CustomBarTooltip />} />
+                                            <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
+                                            <Bar
+                                                name="Amount Raised ($ USD)"
+                                                dataKey="Amount Raised"
+                                                fill="#D4AF37"
+                                                radius={[5, 5, 0, 0]}
+                                            />
+                                        </BarChart>
                                     </ResponsiveContainer>
                                 </div>
                             </div>
