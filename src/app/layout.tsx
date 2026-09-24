@@ -28,7 +28,7 @@ export const metadata: Metadata = {
   applicationName: 'Ark of Hope Project',
   authors: [{ name: 'Ark of Hope Project' }],
   generator: 'Next.js',
-  keywords: ['Ark of Hope', 'Nepal Ark', 'The Ark Of Hope Pvt. Ltd.', 'Revival Zahaz', 'Chitwan Ark', 'Faith in Nepal', 'Build the Ark', 'Sanima Bank SNMANPKA'],
+  keywords: ['Ark of Hope', 'Nepal Ark', 'The Ark Of Hope Pvt. Ltd.', 'Shanti Foundation Trust', 'Revival Zahaz', 'Chitwan Ark', 'Faith in Nepal', 'Build the Ark', 'Sanima Bank SNMANPKA', 'Nepal SBI Bank NSBINPKA'],
   icons: {
     icon: [
       { url: '/logo.png?v=2', sizes: '512x512', type: 'image/png' },

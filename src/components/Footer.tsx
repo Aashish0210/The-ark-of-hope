@@ -76,6 +76,10 @@ export default function Footer() {
                 Sanima Bank (SWIFT: <strong className="text-gold font-mono">SNMANPKA</strong>)
               </span>
               <span className="inline-flex items-center gap-1.5 bg-black/40 px-3 py-1 rounded-full border border-gold/15">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                Nepal SBI Bank (SWIFT: <strong className="text-gold font-mono">NSBINPKA</strong>)
+              </span>
+              <span className="inline-flex items-center gap-1.5 bg-black/40 px-3 py-1 rounded-full border border-gold/15">
                 Wise &amp; Remitly Supported
               </span>
             </div>

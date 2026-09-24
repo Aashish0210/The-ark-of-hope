@@ -44,10 +44,17 @@ export async function PUT(req: Request) {
         }
 
         const body = await req.json();
-        const { raised, goal, heroTitle, heroSubtitle, heroText, maintenanceMode } = body;
+        const { raised, addAmount, goal, heroTitle, heroSubtitle, heroText, maintenanceMode } = body;
+
+        const existing = await prisma.siteSettings.findFirst({
+            orderBy: { id: 'asc' }
+        });
 
         const updateData: any = {};
-        if (raised !== undefined && raised !== null && !isNaN(Number(raised))) {
+        if (addAmount !== undefined && addAmount !== null && !isNaN(Number(addAmount))) {
+            const currentRaised = Number(existing?.raised || 0);
+            updateData.raised = currentRaised + parseFloat(addAmount);
+        } else if (raised !== undefined && raised !== null && !isNaN(Number(raised))) {
             updateData.raised = parseFloat(raised);
         }
         if (goal !== undefined && goal !== null && !isNaN(Number(goal))) {
@@ -57,10 +64,6 @@ export async function PUT(req: Request) {
         if (heroSubtitle !== undefined) updateData.heroSubtitle = String(heroSubtitle);
         if (heroText !== undefined) updateData.heroText = String(heroText);
         if (maintenanceMode !== undefined) updateData.maintenanceMode = Boolean(maintenanceMode);
-
-        const existing = await prisma.siteSettings.findFirst({
-            orderBy: { id: 'asc' }
-        });
 
         let settings;
         if (existing) {

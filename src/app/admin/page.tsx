@@ -27,6 +27,8 @@ export default function AdminPage() {
         goal: 7000000,
         maintenanceMode: false
     });
+    const [addAmount, setAddAmount] = useState<string>('');
+    const [amountMode, setAmountMode] = useState<'add' | 'direct'>('add');
     const [trends, setTrends] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [profile, setProfile] = useState<any>({ email: '', image: '', password: '' });
@@ -182,11 +184,17 @@ export default function AdminPage() {
     const saveSettings = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
+            const currentRaised = Number(settings?.raised || 0);
+            const increment = parseFloat(addAmount) || 0;
+            const newRaised = (amountMode === 'add' && increment !== 0)
+                ? currentRaised + increment
+                : Number(settings?.raised || 0);
+
             const res = await fetch('/api/settings', {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    raised: settings.raised,
+                    raised: newRaised,
                     goal: settings.goal,
                     maintenanceMode: settings.maintenanceMode
                 })
@@ -195,7 +203,8 @@ export default function AdminPage() {
             if (res.ok) {
                 const updated = await res.json();
                 setSettings(updated);
-                showToast('Site settings updated successfully!');
+                setAddAmount('');
+                showToast(`Site settings updated successfully! Total raised: $${Number(updated.raised).toLocaleString()}`);
             } else {
                 const errorData = await res.json().catch(() => ({}));
                 showToast(errorData.details || errorData.error || 'Failed to save settings.', 'error');
@@ -507,23 +516,84 @@ export default function AdminPage() {
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div>
-                                        <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
-                                            Raised Amount ($ USD)
-                                        </label>
-                                        <div className="relative">
-                                            <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 font-bold">$</span>
-                                            <input
-                                                type="number"
-                                                step="any"
-                                                value={settings?.raised ?? 0}
-                                                onChange={(e) => setSettings({ ...settings, raised: e.target.value })}
-                                                className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-8 pr-4 py-3 text-slate-800 focus:outline-none focus:border-gold focus:bg-white transition-all font-semibold text-lg"
-                                                placeholder="0"
-                                            />
+                                        <div className="flex items-center justify-between mb-2">
+                                            <label className="block text-xs font-bold uppercase tracking-wider text-slate-700">
+                                                {amountMode === 'add' ? 'Insert Amount to Add ($ USD)' : 'Exact Raised Amount ($ USD)'}
+                                            </label>
+                                            <div className="flex items-center gap-1 bg-slate-100 p-0.5 rounded-lg text-[10px] font-semibold text-slate-600">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setAmountMode('add')}
+                                                    className={`px-2 py-0.5 rounded transition-all ${amountMode === 'add' ? 'bg-white shadow-sm text-slate-900 font-bold' : 'hover:text-slate-900'}`}
+                                                >
+                                                    ➕ Add to Previous
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setAmountMode('direct')}
+                                                    className={`px-2 py-0.5 rounded transition-all ${amountMode === 'direct' ? 'bg-white shadow-sm text-slate-900 font-bold' : 'hover:text-slate-900'}`}
+                                                >
+                                                    ✏️ Direct Total
+                                                </button>
+                                            </div>
                                         </div>
-                                        <span className="text-[11px] text-slate-500 mt-1 block">
-                                            Directly drives the boat progress tracker and percentage.
-                                        </span>
+
+                                        {/* Display Previous / Last Amount */}
+                                        <div className="mb-2 px-3 py-2 bg-slate-100 border border-slate-200 rounded-xl flex items-center justify-between text-xs">
+                                            <span className="text-slate-600 font-medium">Last / Current Amount:</span>
+                                            <span className="font-bold text-slate-900 font-mono text-sm">
+                                                ${Number(settings?.raised || 0).toLocaleString()}
+                                            </span>
+                                        </div>
+
+                                        {amountMode === 'add' ? (
+                                            <div>
+                                                <div className="relative">
+                                                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 font-bold">+ $</span>
+                                                    <input
+                                                        type="number"
+                                                        step="any"
+                                                        value={addAmount}
+                                                        onChange={(e) => setAddAmount(e.target.value)}
+                                                        className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-4 py-3 text-slate-800 focus:outline-none focus:border-gold focus:bg-white transition-all font-semibold text-lg"
+                                                        placeholder="Enter amount to add (e.g. 5000)"
+                                                    />
+                                                </div>
+
+                                                {/* Live Addition Preview */}
+                                                {Boolean(addAmount && !isNaN(parseFloat(addAmount)) && parseFloat(addAmount) !== 0) && (
+                                                    <div className="mt-2 p-2.5 bg-amber-50 border border-amber-200 rounded-lg text-xs flex items-center justify-between text-amber-900 animate-in fade-in duration-200">
+                                                        <span>
+                                                            ${Number(settings?.raised || 0).toLocaleString()} + ${parseFloat(addAmount).toLocaleString()}
+                                                        </span>
+                                                        <span className="font-bold bg-amber-200 text-amber-950 px-2 py-0.5 rounded">
+                                                            New Total: ${(Number(settings?.raised || 0) + parseFloat(addAmount)).toLocaleString()}
+                                                        </span>
+                                                    </div>
+                                                )}
+
+                                                <span className="text-[11px] text-slate-500 mt-1 block">
+                                                    Inserted amount will be added to the last amount (e.g. $10,000 + $5,000 = $15,000).
+                                                </span>
+                                            </div>
+                                        ) : (
+                                            <div>
+                                                <div className="relative">
+                                                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 font-bold">$</span>
+                                                    <input
+                                                        type="number"
+                                                        step="any"
+                                                        value={settings?.raised ?? 0}
+                                                        onChange={(e) => setSettings({ ...settings, raised: e.target.value })}
+                                                        className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-8 pr-4 py-3 text-slate-800 focus:outline-none focus:border-gold focus:bg-white transition-all font-semibold text-lg"
+                                                        placeholder="0"
+                                                    />
+                                                </div>
+                                                <span className="text-[11px] text-slate-500 mt-1 block">
+                                                    Direct total override mode.
+                                                </span>
+                                            </div>
+                                        )}
                                     </div>
 
                                     <div>
