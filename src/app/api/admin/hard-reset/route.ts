@@ -58,6 +58,11 @@ export async function POST(req: Request) {
             await prisma.donation.deleteMany({});
         } catch (_) {}
 
+        // 4. Reset all monthly progress records to 0
+        try {
+            await prisma.trendPoint.deleteMany({});
+        } catch (_) {}
+
         // Invalidate Next.js cache across public site & admin
         try {
             revalidatePath('/', 'layout');

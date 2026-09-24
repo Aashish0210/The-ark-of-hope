@@ -200,6 +200,7 @@ export default function AdminPage() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     raised: newRaised,
+                    addAmount: (amountMode === 'add' && increment !== 0) ? increment : undefined,
                     goal: settings.goal,
                     maintenanceMode: settings.maintenanceMode
                 })
@@ -209,6 +210,9 @@ export default function AdminPage() {
                 const updated = await res.json();
                 setSettings(updated);
                 setAddAmount('');
+                // Refresh trends so the monthly tracker chart updates immediately
+                const resTrends = await fetch('/api/trend', { cache: 'no-store' });
+                if (resTrends.ok) setTrends(await resTrends.json());
                 showToast(`Site settings updated successfully! Total raised: $${Number(updated.raised).toLocaleString()}`);
             } else {
                 const errorData = await res.json().catch(() => ({}));
@@ -246,6 +250,7 @@ export default function AdminPage() {
             if (res.ok) {
                 showToast('Hard Reset Successful! Raised amount is $0 and password is arkofhope@2026');
                 setSettings((prev: any) => ({ ...prev, raised: 0 }));
+                setTrends([]);
                 setShowResetModal(false);
             } else {
                 showToast(data.error || 'Hard reset failed', 'error');
@@ -275,35 +280,35 @@ export default function AdminPage() {
     const percentageStr = percentage.toFixed(1);
 
     const universalMonths = [
-        { key: 'Jan', name: 'January', weight: 0.05 },
-        { key: 'Feb', name: 'February', weight: 0.06 },
-        { key: 'Mar', name: 'March', weight: 0.08 },
-        { key: 'Apr', name: 'April', weight: 0.09 },
-        { key: 'May', name: 'May', weight: 0.11 },
-        { key: 'Jun', name: 'June', weight: 0.12 },
-        { key: 'Jul', name: 'July', weight: 0.13 },
-        { key: 'Aug', name: 'August', weight: 0.15 },
-        { key: 'Sep', name: 'September', weight: 0.21 },
-        { key: 'Oct', name: 'October', weight: 0 },
-        { key: 'Nov', name: 'November', weight: 0 },
-        { key: 'Dec', name: 'December', weight: 0 }
+        { key: 'Jan', name: 'January' },
+        { key: 'Feb', name: 'February' },
+        { key: 'Mar', name: 'March' },
+        { key: 'Apr', name: 'April' },
+        { key: 'May', name: 'May' },
+        { key: 'Jun', name: 'June' },
+        { key: 'Jul', name: 'July' },
+        { key: 'Aug', name: 'August' },
+        { key: 'Sep', name: 'September' },
+        { key: 'Oct', name: 'October' },
+        { key: 'Nov', name: 'November' },
+        { key: 'Dec', name: 'December' }
     ];
 
     const currentMonthIndex = new Date().getMonth(); // 8 for September in 2026
 
+    // Map monthly points from trends table (type === 'MONTHLY')
+    const monthlyTrends = trends.filter((t: any) => t.type === 'MONTHLY');
+    const hasMonthlyRecords = monthlyTrends.length > 0 && monthlyTrends.some((t: any) => Number(t.value1) > 0);
+
     const monthlyRaisedData = universalMonths.map((m, idx) => {
         let amount = 0;
-        if (raised > 0) {
-            if (idx < currentMonthIndex) {
-                amount = Math.round(raised * m.weight);
-            } else if (idx === currentMonthIndex) {
-                const previousMonthsSum = universalMonths
-                    .slice(0, currentMonthIndex)
-                    .reduce((sum, item) => sum + Math.round(raised * item.weight), 0);
-                amount = Math.max(0, raised - previousMonthsSum);
-            } else {
-                amount = 0;
-            }
+        if (hasMonthlyRecords) {
+            const found = monthlyTrends.find((t: any) => t.label === m.key || Number(t.order) === idx);
+            amount = found ? Number(found.value1 || 0) : 0;
+        } else {
+            // No synthetic division across months!
+            // The whole inputted amount is placed directly on the active month (e.g. September)
+            amount = (idx === currentMonthIndex) ? raised : 0;
         }
         return {
             month: m.key,
@@ -318,9 +323,16 @@ export default function AdminPage() {
             const dataItem = payload[0]?.payload;
             return (
                 <div className="bg-[#08111b] border border-gold/40 text-white p-3 rounded-xl shadow-2xl text-xs space-y-1.5 z-50 min-w-[140px]">
-                    <p className="font-bold text-gold text-xs border-b border-white/10 pb-1">
-                        {dataItem?.fullName || label}
-                    </p>
+                    <div className="flex items-center justify-between gap-2 border-b border-white/10 pb-1">
+                        <p className="font-bold text-gold text-xs">
+                            {dataItem?.fullName || label}
+                        </p>
+                        {dataItem?.isCurrent && (
+                            <span className="text-[10px] bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-1.5 py-0.5 rounded font-semibold">
+                                Active Month
+                            </span>
+                        )}
+                    </div>
                     <div className="flex items-center justify-between gap-3 pt-1">
                         <span className="text-slate-400">Amount Raised:</span>
                         <span className="font-mono font-bold text-white text-sm">
@@ -523,7 +535,7 @@ export default function AdminPage() {
                                         </div>
                                     </div>
                                     <p className="text-xs text-slate-500 mb-4">
-                                        Monthly breakdown of funds raised across the 12 calendar months (Jan – Dec).
+                                        Universal monthly tracker across all 12 calendar months (Jan – Dec). Funds inputted are attributed directly to the active month without synthetic division.
                                     </p>
                                 </div>
 
@@ -543,9 +555,15 @@ export default function AdminPage() {
                                             <Bar
                                                 name="Amount Raised ($ USD)"
                                                 dataKey="Amount Raised"
-                                                fill="#D4AF37"
                                                 radius={[5, 5, 0, 0]}
-                                            />
+                                            >
+                                                {monthlyRaisedData.map((entry, index) => (
+                                                    <Cell
+                                                        key={`bar-cell-${index}`}
+                                                        fill={entry.isCurrent ? '#F59E0B' : entry["Amount Raised"] > 0 ? '#D4AF37' : '#cbd5e1'}
+                                                    />
+                                                ))}
+                                            </Bar>
                                         </BarChart>
                                     </ResponsiveContainer>
                                 </div>

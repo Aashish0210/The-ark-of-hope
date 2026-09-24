@@ -6,11 +6,34 @@ import { authOptions } from "@/lib/auth";
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
+const UNIVERSAL_MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
 export async function GET() {
     try {
-        const trends = await prisma.trendPoint.findMany({
+        let trends = await prisma.trendPoint.findMany({
             orderBy: { order: 'asc' }
         });
+        const monthly = trends.filter((t: any) => t.type === 'MONTHLY');
+
+        // If no monthly points exist, seed with current month receiving current raised (if any) and 0 for others
+        if (monthly.length === 0) {
+            const settings = await prisma.siteSettings.findFirst({ orderBy: { id: 'asc' } });
+            const currentRaised = Number(settings?.raised || 0);
+            const currentMonthIdx = new Date().getMonth();
+
+            const seedData = UNIVERSAL_MONTHS.map((label, idx) => ({
+                type: 'MONTHLY',
+                label,
+                value1: (idx === currentMonthIdx) ? currentRaised : 0,
+                value2: null,
+                order: idx
+            }));
+
+            await prisma.trendPoint.deleteMany({});
+            await prisma.trendPoint.createMany({ data: seedData });
+            trends = await prisma.trendPoint.findMany({ orderBy: { order: 'asc' } });
+        }
+
         return NextResponse.json(trends);
     } catch (error) {
         console.error('Fetch trends error:', error);
