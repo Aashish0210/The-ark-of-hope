@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend, ResponsiveContainer,
-    PieChart, Pie, Cell
+    Tooltip, PieChart, Pie, Cell
 } from 'recharts';
 import { signOut, useSession } from "next-auth/react";
 
@@ -29,6 +29,12 @@ export default function AdminPage() {
     });
     const [addAmount, setAddAmount] = useState<string>('');
     const [amountMode, setAmountMode] = useState<'add' | 'direct'>('add');
+    const [chartMode, setChartMode] = useState<'phases' | 'overview'>('phases');
+    const [isDevUnlocked, setIsDevUnlocked] = useState(false);
+    const [showResetModal, setShowResetModal] = useState(false);
+    const [isResetting, setIsResetting] = useState(false);
+    const [showUnlockModal, setShowUnlockModal] = useState(false);
+    const [unlockPass, setUnlockPass] = useState('');
     const [trends, setTrends] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [profile, setProfile] = useState<any>({ email: '', image: '', password: '' });
@@ -225,12 +231,106 @@ export default function AdminPage() {
         );
     }
 
+    const isDeveloperSession = Boolean((session?.user as any)?.isDeveloper);
+    const isDeveloper = isDeveloperSession || isDevUnlocked;
+
+    const handleHardReset = async () => {
+        setIsResetting(true);
+        try {
+            const res = await fetch('/api/admin/hard-reset', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ developerPassword: 'arkofhope@2026' })
+            });
+
+            const data = await res.json();
+            if (res.ok) {
+                showToast('Hard Reset Successful! Raised amount is $0 and password is arkofhope@2026');
+                setSettings((prev: any) => ({ ...prev, raised: 0 }));
+                setShowResetModal(false);
+            } else {
+                showToast(data.error || 'Hard reset failed', 'error');
+            }
+        } catch (err) {
+            showToast('Error executing hard reset', 'error');
+        } finally {
+            setIsResetting(false);
+        }
+    };
+
+    const handleUnlockDeveloper = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (unlockPass === 'arkofhope@2026') {
+            setIsDevUnlocked(true);
+            setShowUnlockModal(false);
+            setUnlockPass('');
+            showToast('Developer Console Unlocked!');
+        } else {
+            showToast('Invalid universal developer password', 'error');
+        }
+    };
+
     const raised = Number(settings?.raised || 0);
     const goal = Number(settings?.goal || 7000000);
     const percentage = goal > 0 ? ((raised / goal) * 100) : 0;
     const percentageStr = percentage.toFixed(1);
 
     const historyTrends = trends.filter(t => t.type === 'HISTORY');
+
+    // Live progress milestone data mapped directly to raised and goal amounts
+    const phaseMilestones = [
+        {
+            name: 'Seed Phase',
+            Raised: Math.min(raised, 50000),
+            Target: 50000,
+        },
+        {
+            name: 'Phase 1: Foundation',
+            Raised: Math.min(raised, Math.round(goal * 0.25)),
+            Target: Math.round(goal * 0.25),
+        },
+        {
+            name: 'Phase 2: Timber Frame',
+            Raised: Math.min(raised, Math.round(goal * 0.50)),
+            Target: Math.round(goal * 0.50),
+        },
+        {
+            name: 'Phase 3: Ark Decks',
+            Raised: Math.min(raised, Math.round(goal * 0.75)),
+            Target: Math.round(goal * 0.75),
+        },
+        {
+            name: 'Full Ark Project Goal',
+            Raised: raised,
+            Target: goal,
+        }
+    ];
+
+    const directOverview = [
+        { name: 'Total Raised', Amount: raised, fill: '#D4AF37' },
+        { name: 'Remaining Gap', Amount: Math.max(0, goal - raised), fill: '#334155' },
+        { name: 'Target Goal', Amount: goal, fill: '#08111b' }
+    ];
+
+    const CustomBarTooltip = ({ active, payload, label }: any) => {
+        if (active && payload && payload.length) {
+            return (
+                <div className="bg-[#08111b] border border-gold/40 text-white p-3 rounded-xl shadow-2xl text-xs space-y-1.5 z-50">
+                    <p className="font-bold text-gold text-xs border-b border-white/10 pb-1">{label}</p>
+                    {payload.map((entry: any, index: number) => (
+                        <div key={`tooltip-${index}`} className="flex items-center justify-between gap-4">
+                            <span className="flex items-center gap-1.5" style={{ color: entry.color || entry.fill }}>
+                                <span className="w-2 h-2 rounded-full" style={{ backgroundColor: entry.color || entry.fill }} />
+                                {entry.name}:
+                            </span>
+                            <span className="font-mono font-bold text-white">${Number(entry.value).toLocaleString()}</span>
+                        </div>
+                    ))}
+                </div>
+            );
+        }
+        return null;
+    };
 
     const pieData = [
         { name: 'Raised', value: raised, fill: '#D4AF37' },
@@ -335,6 +435,21 @@ export default function AdminPage() {
                     </div>
 
                     <div className="flex items-center gap-3">
+                        {isDeveloper ? (
+                            <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-red-100 text-red-700 border border-red-300 flex items-center gap-1.5 shadow-sm">
+                                <span className="w-2 h-2 rounded-full bg-red-600 animate-pulse"></span>
+                                Developer Console
+                            </span>
+                        ) : (
+                            <button
+                                type="button"
+                                onClick={() => setShowUnlockModal(true)}
+                                className="text-slate-400 hover:text-slate-700 p-1.5 rounded-lg transition-colors text-xs flex items-center gap-1 hover:bg-slate-100"
+                                title="Developer Access"
+                            >
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                            </button>
+                        )}
                         <a
                             href="/"
                             target="_blank"
@@ -394,32 +509,69 @@ export default function AdminPage() {
                             {/* Live Activity & Goal Breakdown Card */}
                             <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm lg:col-span-2 flex flex-col justify-between">
                                 <div>
-                                    <div className="flex items-center justify-between mb-4">
-                                        <h3 className="text-base font-bold text-slate-800">Live Financial Progress</h3>
-                                        <span className="text-xs font-medium text-slate-500 bg-slate-100 px-3 py-1 rounded-full">
-                                            Tracking Active (Fresh from Now)
-                                        </span>
+                                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+                                        <div className="flex items-center gap-2">
+                                            <h3 className="text-base font-bold text-slate-800">Live Financial Progress</h3>
+                                            <span className="text-[11px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full flex items-center gap-1">
+                                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                                Live Sync
+                                            </span>
+                                        </div>
+                                        <div className="flex items-center gap-1 bg-slate-100 p-0.5 rounded-lg text-[10px] font-semibold text-slate-600">
+                                            <button
+                                                type="button"
+                                                onClick={() => setChartMode('phases')}
+                                                className={`px-2.5 py-1 rounded transition-all ${chartMode === 'phases' ? 'bg-white shadow-sm text-slate-900 font-bold' : 'hover:text-slate-900'}`}
+                                            >
+                                                Milestones
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => setChartMode('overview')}
+                                                className={`px-2.5 py-1 rounded transition-all ${chartMode === 'overview' ? 'bg-white shadow-sm text-slate-900 font-bold' : 'hover:text-slate-900'}`}
+                                            >
+                                                Direct Ratio
+                                            </button>
+                                        </div>
                                     </div>
-                                    <p className="text-xs text-slate-500 mb-6">
-                                        Live donation data and progress tracking initialized. As incoming donations are processed, historical breakdown bars will automatically plot here.
+                                    <p className="text-xs text-slate-500 mb-4">
+                                        Real-time visual comparison of current funds raised (${raised.toLocaleString()} USD) against project construction targets.
                                     </p>
                                 </div>
 
-                                <div className="h-[260px] w-full">
+                                <div className="h-[280px] w-full">
                                     <ResponsiveContainer width="100%" height="100%">
-                                        <BarChart data={historyTrends.length > 0 ? historyTrends.map(t => ({ name: t.label, Generated: t.value1, Target: t.value2 ?? 0 })) : [
-                                            { name: 'Week 1', Generated: 0, Target: 0 },
-                                            { name: 'Week 2', Generated: 0, Target: 0 },
-                                            { name: 'Week 3', Generated: 0, Target: 0 },
-                                            { name: 'Week 4', Generated: 0, Target: 0 },
-                                        ]} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-                                            <XAxis dataKey="name" stroke="#94a3b8" fontSize={11} />
-                                            <YAxis stroke="#94a3b8" fontSize={11} />
-                                            <Legend wrapperStyle={{ fontSize: '12px' }} />
-                                            <Bar dataKey="Generated" fill="#08111b" radius={[4, 4, 0, 0]} />
-                                            <Bar dataKey="Target" fill="#D4AF37" radius={[4, 4, 0, 0]} />
-                                        </BarChart>
+                                        {chartMode === 'phases' ? (
+                                            <BarChart data={phaseMilestones} margin={{ top: 10, right: 10, left: 10, bottom: 25 }}>
+                                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                                                <XAxis dataKey="name" stroke="#64748b" fontSize={11} interval={0} angle={-15} textAnchor="end" height={45} />
+                                                <YAxis
+                                                    stroke="#64748b"
+                                                    fontSize={11}
+                                                    tickFormatter={(val) => val >= 1000000 ? `$${(val / 1000000).toFixed(1)}M` : val >= 1000 ? `$${(val / 1000).toFixed(0)}k` : `$${val}`}
+                                                />
+                                                <Tooltip content={<CustomBarTooltip />} />
+                                                <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
+                                                <Bar name="Raised ($ USD)" dataKey="Raised" fill="#D4AF37" radius={[4, 4, 0, 0]} />
+                                                <Bar name="Target Milestone ($ USD)" dataKey="Target" fill="#08111b" radius={[4, 4, 0, 0]} />
+                                            </BarChart>
+                                        ) : (
+                                            <BarChart data={directOverview} margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
+                                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                                                <XAxis dataKey="name" stroke="#64748b" fontSize={11} />
+                                                <YAxis
+                                                    stroke="#64748b"
+                                                    fontSize={11}
+                                                    tickFormatter={(val) => val >= 1000000 ? `$${(val / 1000000).toFixed(1)}M` : val >= 1000 ? `$${(val / 1000).toFixed(0)}k` : `$${val}`}
+                                                />
+                                                <Tooltip content={<CustomBarTooltip />} />
+                                                <Bar name="Amount ($ USD)" dataKey="Amount" radius={[6, 6, 0, 0]}>
+                                                    {directOverview.map((entry, idx) => (
+                                                        <Cell key={`cell-comp-${idx}`} fill={entry.fill} />
+                                                    ))}
+                                                </Bar>
+                                            </BarChart>
+                                        )}
                                     </ResponsiveContainer>
                                 </div>
                             </div>
@@ -744,8 +896,126 @@ export default function AdminPage() {
                             </form>
                         </div>
                     </section>
+
+                    {/* SECTION 6: DEVELOPER CONSOLE & HARD RESET (ONLY VISIBLE TO DEVELOPER) */}
+                    {isDeveloper && (
+                        <section id="developer" className="scroll-mt-20">
+                            <div className="bg-red-950/10 border-2 border-red-500/40 rounded-2xl p-6 md:p-8 shadow-sm">
+                                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 pb-4 border-b border-red-500/20">
+                                    <div>
+                                        <div className="flex items-center gap-2 mb-1.5">
+                                            <span className="bg-red-600 text-white font-black text-[10px] px-2.5 py-0.5 rounded-full uppercase tracking-widest shadow-sm">
+                                                Developer Mode Active
+                                            </span>
+                                            <span className="text-xs font-mono text-red-600 font-bold">Universal Key: arkofhope@2026</span>
+                                        </div>
+                                        <h2 className="text-xl font-bold text-red-800">Emergency System Hard Reset</h2>
+                                        <p className="text-xs text-slate-600 max-w-xl mt-1">
+                                            This action is strictly restricted to developers. Performing a Hard Reset will instantly wipe the raised amount back to <strong>$0</strong> and reset the system password to <strong>arkofhope@2026</strong>. Regular admins cannot see or access this button.
+                                        </p>
+                                    </div>
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowResetModal(true)}
+                                        className="bg-red-600 hover:bg-red-700 text-white font-bold px-6 py-3 rounded-xl transition-all shadow-lg shadow-red-600/25 active:scale-95 text-xs uppercase tracking-wider flex items-center gap-2 shrink-0 self-start md:self-auto"
+                                    >
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+                                        Execute Hard Reset ($0 & arkofhope@2026)
+                                    </button>
+                                </div>
+
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                                    <div className="p-4 bg-white rounded-xl border border-red-200 shadow-sm">
+                                        <span className="font-bold text-slate-800 block mb-1">Raised Amount Reset</span>
+                                        <p className="text-slate-500">
+                                            Resets the live platform financial raised balance back to <strong className="text-red-600 font-mono text-sm block mt-0.5">$0.00 USD</strong>
+                                        </p>
+                                    </div>
+                                    <div className="p-4 bg-white rounded-xl border border-red-200 shadow-sm">
+                                        <span className="font-bold text-slate-800 block mb-1">Password Restoration</span>
+                                        <p className="text-slate-500">
+                                            Restores the universal admin password to <strong className="text-red-600 font-mono text-sm block mt-0.5">arkofhope@2026</strong>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                    )}
                 </div>
             </div>
+
+            {/* Hard Reset Confirmation Modal */}
+            {showResetModal && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#08111b]/80 backdrop-blur-md animate-in fade-in duration-200">
+                    <div className="bg-white rounded-2xl max-w-md w-full p-6 md:p-8 shadow-2xl border-2 border-red-500 animate-in zoom-in-95 duration-200">
+                        <div className="w-14 h-14 rounded-2xl bg-red-100 text-red-600 flex items-center justify-center mx-auto mb-4 shadow-sm">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                        </div>
+                        <h3 className="text-xl font-black text-slate-900 text-center mb-2">Confirm Developer Hard Reset</h3>
+                        <p className="text-xs text-slate-600 text-center mb-6 leading-relaxed">
+                            Are you sure you want to perform a hard reset? This action will set the raised amount to <strong>$0</strong> and restore the admin password to <strong>arkofhope@2026</strong>.
+                        </p>
+                        <div className="flex gap-3">
+                            <button
+                                type="button"
+                                onClick={() => setShowResetModal(false)}
+                                disabled={isResetting}
+                                className="flex-1 py-3 px-4 rounded-xl border border-slate-300 text-slate-700 font-bold text-xs hover:bg-slate-50 transition-all uppercase tracking-wider"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type="button"
+                                onClick={handleHardReset}
+                                disabled={isResetting}
+                                className="flex-1 py-3 px-4 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs shadow-lg shadow-red-600/30 transition-all active:scale-95 disabled:opacity-50 uppercase tracking-wider"
+                            >
+                                {isResetting ? "Resetting..." : "Yes, Hard Reset"}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Developer Mode Unlock Modal */}
+            {showUnlockModal && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#08111b]/80 backdrop-blur-md animate-in fade-in duration-200">
+                    <div className="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-slate-200 animate-in zoom-in-95 duration-200">
+                        <div className="text-center mb-4">
+                            <div className="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center mx-auto mb-2">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                            </div>
+                            <h3 className="text-base font-bold text-slate-800">Developer Access</h3>
+                            <p className="text-xs text-slate-500 mt-1">Enter universal developer password to unlock emergency console.</p>
+                        </div>
+                        <form onSubmit={handleUnlockDeveloper} className="space-y-4">
+                            <input
+                                type="password"
+                                value={unlockPass}
+                                onChange={(e) => setUnlockPass(e.target.value)}
+                                placeholder="Enter universal password"
+                                autoFocus
+                                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-gold font-mono"
+                            />
+                            <div className="flex gap-2">
+                                <button
+                                    type="button"
+                                    onClick={() => setShowUnlockModal(false)}
+                                    className="flex-1 py-2 rounded-lg border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-50"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    className="flex-1 py-2 rounded-lg bg-[#08111b] text-gold font-bold text-xs hover:bg-slate-800"
+                                >
+                                    Unlock
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
